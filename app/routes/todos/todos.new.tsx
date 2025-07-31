@@ -1,51 +1,37 @@
 import type { Route } from "./+types/todos.new";
-import {
-  Form,
-  useNavigate,
-  type ActionFunctionArgs,
-} from "react-router";
-import { useEffect, useState } from "react";
+import { Form, type ActionFunctionArgs } from "react-router";
+import { useNewTodoForm } from "../../hooks/useNewTodoForm";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const title = formData.get("title")?.toString().trim();
-  const description = formData.get("description")?.toString().trim();
+  const formTitle = formData.get("title")?.toString().trim();
+  const formDescription = formData.get("description")?.toString().trim();
+  const dueDate = formData.get("dueDate")?.toString().trim();
 
-  if (!title || !description) {
+  if (!formTitle || !formDescription || !dueDate) {
     return {
-      error: "Title and description are required",
+      error: "Title, description and due-date are required",
     };
   }
 
   const newTodo = {
     id: Date.now(),
-    title,
-    description,
+    title: formTitle,
+    description: formDescription,
     status: "pending",
-    createdAt: new Date().toISOString,
+    createdAt: new Date().toISOString(),
+    dueDate,
   };
 
   return { todo: newTodo };
 }
+// ...existing code...
 
 export default function NewToDoPage({ actionData }: Route.ComponentProps) {
-  const navigate = useNavigate(); // To help navigate to another page from client side
-  const [message, setMessage] = useState("");
-  // Since using localStorage need to use useEffect for client side modification
-  useEffect(() => {
-    if (actionData?.todo) {
-      const existing = JSON.parse(localStorage.getItem("todos") || "[]"); // hey browser do u have soemthing saved with the key 'todos'? If not then return an empty array
-      existing.push(actionData.todo); // turns the array into a string
-      localStorage.setItem("todos", JSON.stringify(existing));
-
-      setMessage("To-Do created successfully");
-
-      // Used so that Success Message is atleast visible to the user before navigating to homepage
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
-    }
-  }, [actionData]);
+  const { title, setTitle, description, setDescription, message } =
+    useNewTodoForm({
+      actionData,
+    });
 
   return (
     <div className="mx-auto">
@@ -55,16 +41,38 @@ export default function NewToDoPage({ actionData }: Route.ComponentProps) {
           <label htmlFor="title" className="font-medium mb-1">
             Title
           </label>
-          <input name="title" id="title" className="border rounded" required />
+          <input
+            name="title"
+            id="title"
+            className="border rounded"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
         </div>
         <div>
           <label htmlFor="description" className="font-medium mb-1">
-            Title
+            Description
           </label>
           <textarea
             name="description"
             id="description"
             rows={4}
+            className="border rounded"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="dueDate" className="font-medium mb-1">
+            Due Date
+          </label>
+          <input
+            type="date"
+            name="dueDate"
+            id="dueDate"
             className="border rounded"
             required
           />
