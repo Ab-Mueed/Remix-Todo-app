@@ -39,59 +39,52 @@ export default function EditTodo({ actionData, params }: Route.ComponentProps) {
     actionData,
     id,
   });
-  // ...existing code...
+
   return (
-    <main>
-      <h1>Edit To-Do</h1>
-      <Form method="POST">
+    <main className="mx-auto max-w-md">
+      <h1 className="text-2xl font-bold mb-4">Edit To-Do</h1>
+      <Form method="POST" className="flex flex-col gap-4 bg-white p-4 rounded shadow">
         <input type="hidden" name="id" value={todo?.id} />
-        <div>
-          <label htmlFor="title" className="font-medium mb-1">
-            Title
-          </label>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="title" className="font-medium mb-1">Title</label>
           <input
             name="title"
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="border rounded-md"
+            className="border rounded px-2 py-1"
             required
           />
         </div>
-        <div>
-          <label htmlFor="description" className="font-medium mb-1">
-            Description
-          </label>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="description" className="font-medium mb-1">Description</label>
           <textarea
             name="description"
             id="description"
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="border rounded-md"
+            className="border rounded px-2 py-1"
             required
           />
         </div>
-
-        <div>
-          <label htmlFor="dueDate" className="font-medium mb-1">
-            Due Date
-          </label>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="dueDate" className="font-medium mb-1">Due Date</label>
           <input
             type="date"
             name="dueDate"
             id="dueDate"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className="border rounded-md"
+            className="border rounded px-2 py-1"
             required
           />
         </div>
-        <button type="submit" className="hover:bg-emerald-400">
+        <button type="submit" className="hover:bg-emerald-400 px-4 py-2 rounded bg-emerald-300">
           Save Changes
         </button>
       </Form>
-      {message && <p className="text-green-400 italic">{message}</p>}
+      {message && <p className="text-green-400 italic mt-2">{message}</p>}
     </main>
   );
 }
