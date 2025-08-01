@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, href } from "react-router";
 
 export function useNewTodoForm({ actionData }: { actionData: any }) {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export function useNewTodoForm({ actionData }: { actionData: any }) {
       localStorage.setItem("todos", JSON.stringify(existing));
       setMessage("To-Do created successfully");
       setTimeout(() => {
-        navigate("/");
+        navigate(href("/"));
       }, 2000);
     }
   }, [actionData, navigate]);

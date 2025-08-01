@@ -1,7 +1,6 @@
-// ...existing code...
 import { useTodos } from "../hooks/useTodos";
 import type { Filter } from "../hooks/useTodos";
-import { Link } from "react-router";
+import { Link, href } from "react-router";
 
 export default function Home() {
   const {
@@ -9,7 +8,6 @@ export default function Home() {
     setFilter,
     search,
     setSearch,
-    filteredTodos,
     sortedTodos,
     markAsCompleted,
     deleteTodo,
@@ -23,7 +21,7 @@ export default function Home() {
         </h1>
         <p className="text-gray-600 text-center">Your tasks will appear here</p>
         <Link
-          to="/todos/new"
+          to={href("/todos/new")}
           className="border p-2 rounded hover:bg-blue-400 w-40"
         >
           {" "}
@@ -84,7 +82,7 @@ export default function Home() {
                 </div>
                 <div className="flex gap-2">
                   <Link
-                    to={`todos/edit/${todo.id}`}
+                    to={href("/todos/edit/:id", {id: todo.id.toString()})}
                     className="text-sm px-3 py-1 bg-blue-300 rounded-md hover:bg-blue-600"
                   >
                     Edit

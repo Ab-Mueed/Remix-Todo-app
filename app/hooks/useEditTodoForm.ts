@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, href } from "react-router";
 
 export type Todo = {
   id: number;
@@ -18,6 +18,7 @@ export function useEditTodoForm({ actionData, id }: { actionData: any; id: numbe
   const [dueDate, setDueDate] = useState("");
   const [message, setMessage] = useState("");
 
+  // Client side hook for accessing localStorage to prefill title, description, due date on form
   useEffect(() => {
     const storedTodo = localStorage.getItem("todos");
     if (storedTodo) {
@@ -32,6 +33,8 @@ export function useEditTodoForm({ actionData, id }: { actionData: any; id: numbe
     }
   }, [id]);
 
+  // client side hook for checking any updates in title, description, due date and updating the todo respectively
+  // using actionData provided by react-router to listen for any changes in form
   useEffect(() => {
     if (actionData?.todo) {
       const storedTodo = localStorage.getItem("todos");
@@ -43,13 +46,14 @@ export function useEditTodoForm({ actionData, id }: { actionData: any; id: numbe
                 ...todo,
                 title: actionData.todo.title,
                 description: actionData.todo.description,
+                dueDate: actionData.todo.dueDate,
               }
             : todo
         );
         localStorage.setItem("todos", JSON.stringify(updateTodo));
         setMessage("To-Do updated successfully");
         setTimeout(() => {
-          navigate("/");
+          navigate(href("/"));
         }, 2000);
       }
     }

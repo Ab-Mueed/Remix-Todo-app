@@ -16,6 +16,7 @@ export function useTodos() {
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
 
+  // Client side hook for accessing localstorage
   useEffect(() => {
     const storedTodos = localStorage.getItem("todos");
     if (storedTodos) {
@@ -23,6 +24,7 @@ export function useTodos() {
     }
   }, []);
 
+  // Filter todo based on status and/or title & description
   const filteredTodos = todos.filter((todo) => {
     const statusMatch = filter === "all" || todo.status === filter;
     const searchMatch =
@@ -31,11 +33,14 @@ export function useTodos() {
     return statusMatch && searchMatch;
   });
 
+  // Sort Todos based on due date
   const sortedTodos = [...filteredTodos].sort((a,b) => {
     const dateA = new Date(a.dueDate || "").getTime();
     const dateB = new Date(b.dueDate || "").getTime();
     return dateA - dateB;
   })
+
+  // Marks a Todo as completed Function Logic
   function markAsCompleted(id: number) {
     const updatedTodo = todos.map((todo) =>
       todo.id === id ? { ...todo, status: "completed" as const } : todo
@@ -44,6 +49,7 @@ export function useTodos() {
     localStorage.setItem("todos", JSON.stringify(updatedTodo));
   }
 
+  // Delete Todo Function Logic
   function deleteTodo(id: number) {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this todo?"
