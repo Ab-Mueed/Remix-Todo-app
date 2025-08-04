@@ -5,27 +5,27 @@ export type Todo = {
   title: string;
   description: string;
   status: "pending" | "completed";
-  createdAt: string;
+  date_created: string;
   dueDate?: string;
+  user_created: string;
 };
 
 export type Filter = "all" | "pending" | "completed";
 
-export function useTodos() {
+export function useTodos({ loaderData }: any) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
 
-  // Client side hook for accessing localstorage
   useEffect(() => {
-    const storedTodos = localStorage.getItem("todos");
-    if (storedTodos) {
-      setTodos(JSON.parse(storedTodos));
+    console.log("useTodos recieved loaderData", loaderData)
+    if (loaderData?.todos) {
+      setTodos(loaderData.todos);
     }
-  }, []);
+  }, [loaderData]);
 
   // Filter todo based on status and/or title & description
-  const filteredTodos = todos.filter((todo) => {
+  const filteredTodos = todos.filter((todo: any) => {
     const statusMatch = filter === "all" || todo.status === filter;
     const searchMatch =
       todo.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -34,42 +34,38 @@ export function useTodos() {
   });
 
   // Sort Todos based on due date
-  const sortedTodos = [...filteredTodos].sort((a,b) => {
+  const sortedTodos = [...filteredTodos].sort((a: any,b: any) => {
     const dateA = new Date(a.dueDate || "").getTime();
     const dateB = new Date(b.dueDate || "").getTime();
     return dateA - dateB;
   })
 
   // Marks a Todo as completed Function Logic
-  function markAsCompleted(id: number) {
-    const updatedTodo = todos.map((todo) =>
-      todo.id === id ? { ...todo, status: "completed" as const } : todo
-    );
-    setTodos(updatedTodo);
-    localStorage.setItem("todos", JSON.stringify(updatedTodo));
-  }
+  // function markAsCompleted(id: number) {
+  //   const updatedTodo = todos.map((todo) =>
+  //     todo.id === id ? { ...todo, status: "completed" as const } : todo
+  //   );
+  //   setTodos(updatedTodo);
+  //   localStorage.setItem("todos", JSON.stringify(updatedTodo));
+  // }
 
   // Delete Todo Function Logic
-  function deleteTodo(id: number) {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this todo?"
-    );
-    if (!confirmDelete) return;
-    const updatedTodo = todos.filter((todo) => todo.id !== id);
-    setTodos(updatedTodo);
-    localStorage.setItem("todos", JSON.stringify(updatedTodo));
-  }
+  // function deleteTodo(id: number) {
+  //   const confirmDelete = window.confirm(
+  //     "Are you sure you want to delete this todo?"
+  //   );
+  //   if (!confirmDelete) return;
+  //   const updatedTodo = todos.filter((todo) => todo.id !== id);
+  //   setTodos(updatedTodo);
+  //   localStorage.setItem("todos", JSON.stringify(updatedTodo));
+  // }
 
   return {
-    todos,
-    setTodos,
     filter,
     setFilter,
     search,
     setSearch,
     filteredTodos,
     sortedTodos,
-    markAsCompleted,
-    deleteTodo,
   };
 }

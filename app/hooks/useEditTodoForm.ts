@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate, href } from "react-router";
 
 export type Todo = {
   id: number;
@@ -9,10 +8,13 @@ export type Todo = {
   status: "pending" | "completed";
 };
 
-
-export function useEditTodoForm({ actionData, id }: { actionData: any; id: number }) {
-  const navigate = useNavigate();
-  const [todo, setTodo] = useState<Todo | null>(null);
+export function useEditTodoForm({
+  actionData,
+  loaderData,
+}: {
+  actionData: any;
+  loaderData: any;
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -20,47 +22,27 @@ export function useEditTodoForm({ actionData, id }: { actionData: any; id: numbe
 
   // Client side hook for accessing localStorage to prefill title, description, due date on form
   useEffect(() => {
-    const storedTodo = localStorage.getItem("todos");
-    if (storedTodo) {
-      const allTodos = JSON.parse(storedTodo);
-      const resultantTodo = allTodos.find((todo: Todo) => todo.id === id);
-      if (resultantTodo) {
-        setTodo(resultantTodo);
-        setTitle(resultantTodo.title);
-        setDescription(resultantTodo.description);
-        setDueDate(resultantTodo.dueDate || "");
+    if (loaderData?.todo) {
+      setTitle(loaderData?.todo.title);
+      setDescription(loaderData?.todo.description);
+      if (loaderData?.todo.dueDate) {
+        const date = new Date(loaderData?.todo.dueDate);
+        setDueDate(date.toISOString().split("T")[0]);
       }
     }
-  }, [id]);
+  }, [loaderData]);
 
   // client side hook for checking any updates in title, description, due date and updating the todo respectively
   // using actionData provided by react-router to listen for any changes in form
   useEffect(() => {
-    if (actionData?.todo) {
-      const storedTodo = localStorage.getItem("todos");
-      if (storedTodo) {
-        const allTodos = JSON.parse(storedTodo);
-        const updateTodo = allTodos.map((todo: Todo) =>
-          todo.id === actionData.todo.id
-            ? {
-                ...todo,
-                title: actionData.todo.title,
-                description: actionData.todo.description,
-                dueDate: actionData.todo.dueDate,
-              }
-            : todo
-        );
-        localStorage.setItem("todos", JSON.stringify(updateTodo));
-        setMessage("To-Do updated successfully");
-        setTimeout(() => {
-          navigate(href("/"));
-        }, 2000);
-      }
+    if (actionData?.error) {
+      setMessage("");
+    } else if (actionData?.todo) {
+      setMessage("Task updated successfully");
     }
-  }, [actionData, navigate]);
+  }, [actionData]);
 
   return {
-    todo,
     title,
     setTitle,
     description,
