@@ -1,30 +1,63 @@
 import type { Route } from "./+types/todos.new";
-import { Form, type ActionFunctionArgs } from "react-router";
+import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import { useNewTodoForm } from "../../hooks/useNewTodoForm";
 import { Link, href } from "react-router";
+import { getAuthToken } from "~/utils/auth.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+  const token = getAuthToken(request);
+  if (!token) {
+    return redirect(href("/login"));
+  }
+
   const formData = await request.formData();
-  const formTitle = formData.get("title")?.toString().trim();
-  const formDescription = formData.get("description")?.toString().trim();
+  const title = formData.get("title")?.toString().trim();
+  const description = formData.get("description")?.toString().trim();
   const dueDate = formData.get("dueDate")?.toString().trim();
 
-  if (!formTitle || !formDescription || !dueDate) {
+  if (!title || !description || !dueDate) {
     return {
       error: "Title, description and due-date are required",
     };
   }
 
-  const newTodo = {
-    id: Date.now(),
-    title: formTitle,
-    description: formDescription,
-    status: "pending",
-    createdAt: new Date().toISOString(),
-    dueDate,
-  };
+  try {
+    console.log("Creating new todo"); // debug log
 
-  return { todo: newTodo };
+    const response = await fetch("http://localhost:8055/items/tasks", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        dueDate: dueDate + "T10:00:00",
+        status: "pending",
+      }),
+    });
+
+    console.log("Create todo response status:", response.status);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Todo created successfully:", data);
+
+      return redirect(href("/"));
+    } else {
+      const errorData = await response.json();
+      console.error("Failed to create todo:", errorData);
+      return {
+        error: "failed to create tasks. Please try again.",
+      };
+    }
+  } catch (error) {
+    console.error("Error creating todo:", error);
+    return {
+      error: "An error occured while creating the task.",
+    };
+  }
 }
 
 export default function NewToDoPage({ actionData }: Route.ComponentProps) {
@@ -42,14 +75,19 @@ export default function NewToDoPage({ actionData }: Route.ComponentProps) {
         >
           ← Back to Tasks
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Create New Task</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+          Create New Task
+        </h1>
         <p className="text-gray-600">Add a new task to stay organized</p>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm">
         <Form method="POST" className="space-y-4 sm:space-y-5">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Title
             </label>
             <input
@@ -65,7 +103,10 @@ export default function NewToDoPage({ actionData }: Route.ComponentProps) {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Description
             </label>
             <textarea
@@ -81,14 +122,17 @@ export default function NewToDoPage({ actionData }: Route.ComponentProps) {
           </div>
 
           <div>
-            <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="dueDate"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Due Date
             </label>
             <input
               type="date"
               name="dueDate"
               id="dueDate"
-              min={new Date().toISOString().split('T')[0]}
+              min={new Date().toISOString().split("T")[0]}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               required
             />
