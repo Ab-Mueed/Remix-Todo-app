@@ -53,8 +53,8 @@ export default function RegisterPage({ actionData }: any) {
           <div className="w-12 h-12 bg-gradient-to-br from-slate-900 to-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
             <span className="text-white font-semibold text-lg">T</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Create account</h1>
-          <p className="text-slate-600">Join us to get started</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Create account</h1>
+          <p className="text-sm sm:text-base text-slate-600">Join us to get started</p>
         </div>
 
         {/* Form */}

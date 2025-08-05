@@ -21,7 +21,7 @@ export default function Sidebar({ search, setSearch, filter, setFilter }: Sideba
     <div className="hidden lg:flex w-64 bg-white border-r border-slate-200 h-screen sticky top-0 flex-col">
       {/* Header */}
       <div className="p-4 border-b border-slate-200">
-        <h2 className="text-base font-semibold text-slate-900 mb-3">Search & Filter</h2>
+        <h2 className="text-sm font-semibold text-slate-900 mb-3">Search & Filter</h2>
         
         {/* Search Bar */}
         <div className="mb-4">

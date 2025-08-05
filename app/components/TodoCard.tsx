@@ -28,7 +28,7 @@ export default function TodoCard({ todo }: TodoCardProps) {
             <div className="flex items-start gap-3 mb-3">
               <div className="flex-1 min-w-0">
                 <h3
-                  className={`text-lg font-semibold text-slate-900 break-words ${
+                  className={`text-base sm:text-lg font-semibold text-slate-900 break-words ${
                     isCompleted ? "line-through text-slate-400" : ""
                   }`}
                 >
@@ -55,7 +55,7 @@ export default function TodoCard({ todo }: TodoCardProps) {
 
             {/* Description */}
             <p
-              className={`text-slate-600 mb-4 break-words leading-relaxed ${
+              className={`text-sm sm:text-base text-slate-600 mb-4 break-words leading-relaxed ${
                 isCompleted ? "opacity-60" : ""
               }`}
             >

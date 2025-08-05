@@ -77,8 +77,8 @@ export default function Home({loaderData}: any) {
                 />
               </div>
               <Link to={href("/todos/new")}>
-                <button className="bg-slate-900 text-white px-6 py-3 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 min-h-[48px] inline-flex items-center justify-center font-medium">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button className="bg-slate-900 text-white px-3 py-3 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 w-12 h-12 inline-flex items-center justify-center font-medium">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </button>
@@ -95,7 +95,7 @@ export default function Home({loaderData}: any) {
                 <button
                   key={option.key}
                   onClick={() => setFilter(option.key as any)}
-                  className={`flex-1 px-4 py-2 rounded-full transition-all duration-200 flex items-center justify-center space-x-2 text-sm font-medium ${
+                  className={`flex-1 px-3 py-2 rounded-full transition-all duration-200 flex items-center justify-center space-x-1 text-xs font-medium ${
                     filter === option.key
                       ? "bg-slate-900 text-white shadow-md"
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200"
@@ -112,10 +112,10 @@ export default function Home({loaderData}: any) {
         <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
           {/* Desktop Header */}
           <div className="hidden lg:block mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
               Your Tasks
             </h1>
-            <p className="text-slate-600">
+            <p className="text-sm lg:text-base text-slate-600">
               {filter === "all" && "All your tasks"}
               {filter === "pending" && "Tasks waiting to be completed"}
               {filter === "completed" && "Your completed tasks"}
@@ -141,10 +141,10 @@ export default function Home({loaderData}: any) {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">
                   {search ? "No tasks found" : "No tasks yet"}
                 </h3>
-                <p className="text-slate-600 mb-6">
+                <p className="text-sm sm:text-base text-slate-600 mb-6">
                   {search
                     ? "Try adjusting your search terms"
                     : "Create your first task to get started"}
