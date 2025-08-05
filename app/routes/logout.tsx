@@ -1,13 +1,9 @@
 import { redirect, href, type ActionFunctionArgs } from "react-router";
 
 export async function action({ request }: ActionFunctionArgs) {
-  console.log("🚪 LOGOUT ACTION CALLED!");
-
-  // Clear both access and refresh token cookies
-  // We'll update these cookie names once you confirm them
   const response = redirect(href("/login"));
 
-  // Clear multiple cookies by setting multiple Set-Cookie headers
+  // Clear all possible authentication cookies
   response.headers.append(
     "Set-Cookie",
     "access_token=; Path=/; HttpOnly; Max-Age=0; SameSite=Strict"
@@ -21,7 +17,6 @@ export async function action({ request }: ActionFunctionArgs) {
     "directus_session_token=; Path=/; HttpOnly; Max-Age=0; SameSite=Strict"
   );
 
-  console.log("🚪 Clearing access and refresh tokens, redirecting to login");
   return response;
 }
 

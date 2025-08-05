@@ -1,8 +1,11 @@
 import { getAuthToken } from "~/utils/auth.server";
+import { TodosService } from "~/services/todos.service";
 import { useTodos } from "../hooks/useTodos";
 import type { Filter } from "../hooks/useTodos";
+import TodoCard from "~/components/TodoCard";
+import Button from "~/components/ui/Button";
+import Input from "~/components/ui/Input";
 import {
-  Form,
   Link,
   href,
   redirect,
@@ -16,27 +19,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(href("/login"));
   }
 
-  console.log("=== Fetching TODOS==="); // debug log
-  console.log('Token exits:', !!token); // debug log
-
   try {
-    console.log("Making request to /items/tasks"); // debug log
-    const response = await fetch("http://localhost:8055/items/tasks", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    console.log("Task APi reponse status:", response.status); // debug log
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Raw API response: ", JSON.stringify(data, null, 2)); // debug log
-      console.log("Tasks data: ", data.data); // debug log
-      console.log("Number of todos:", data.data?.length || 0); // debug log
-      return { todos: data.data || [] };
-    }
-    return { todos: [] };
+    const todos = await TodosService.getTodos(token);
+    return { todos };
   } catch (error) {
-    console.error("Error Fetching todos:", error);
     return { todos: [] };
   }
 }
@@ -51,24 +37,12 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     if (intent === "completed") {
-      await fetch(`http://localhost:8055/items/tasks/${todoId}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "completed" }),
-      });
+      await TodosService.markAsCompleted(token, todoId);
     } else if (intent === "delete") {
-      await fetch(`http://localhost:8055/items/tasks/${todoId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await TodosService.deleteTodo(token, todoId);
     }
   } catch (error) {
-    console.error("Something went wrong:", error);
+    // Action failed silently
   }
   return null;
 }
@@ -76,11 +50,6 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Home({loaderData}: any) {
   const { filter, setFilter, search, setSearch, sortedTodos } =
     useTodos({ loaderData });
-
-  const isOverdue = (dueDate?: string) => {
-    if (!dueDate) return false;
-    return new Date(dueDate) < new Date();
-  };
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -91,34 +60,35 @@ export default function Home({loaderData}: any) {
         <p className="text-gray-600 mb-4">Manage your todos efficiently</p>
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
-          <input
+          <Input
             type="text"
+            id="search-todos"
             placeholder="Search by title or description..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            fullWidth={false}
+            className="sm:flex-1"
           />
           <Link
             to={href("/todos/new")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-center whitespace-nowrap sm:w-auto w-full"
+            className="inline-block"
           >
-            + Add Task
+            <Button variant="primary">
+              + Add Task
+            </Button>
           </Link>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
           {["all", "pending", "completed"].map((f) => (
-            <button
+            <Button
               key={f}
               onClick={() => setFilter(f as Filter)}
-              className={`px-3 sm:px-4 py-2 rounded text-sm sm:text-base ${
-                filter === f
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              variant={filter === f ? "primary" : "secondary"}
+              size="sm"
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -150,118 +120,17 @@ export default function Home({loaderData}: any) {
           </p>
           <Link
             to={href("/todos/new")}
-            className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="inline-block"
           >
-            Create Your First Task
+            <Button variant="primary">
+              Create Your First Task
+            </Button>
           </Link>
         </div>
       ) : (
         <div className="space-y-3 sm:space-y-4">
           {sortedTodos.map((todo) => (
-            <div
-              key={todo.id}
-              className={`w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm ${
-                todo.status === "completed" ? "opacity-75" : ""
-              } ${isOverdue(todo.dueDate) && todo.status !== "completed" ? "border-l-4 border-red-500" : ""}`}
-            >
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h3
-                      className={`text-base sm:text-lg font-semibold text-gray-800 break-words ${
-                        todo.status === "completed"
-                          ? "line-through text-gray-500"
-                          : ""
-                      }`}
-                    >
-                      {todo.title}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded shrink-0 ${
-                        todo.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {todo.status}
-                    </span>
-                    {isOverdue(todo.dueDate) && todo.status !== "completed" && (
-                      <span className="px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-800 shrink-0">
-                        Overdue
-                      </span>
-                    )}
-                  </div>
-
-                  <p
-                    className={`text-gray-600 mb-3 break-words ${
-                      todo.status === "completed" ? "opacity-75" : ""
-                    }`}
-                  >
-                    {todo.description}
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-sm text-gray-500">
-                    <span className="shrink-0">
-                      Created {new Date(todo.date_created).toLocaleDateString()}
-                    </span>
-                    {todo.dueDate && (
-                      <span
-                        className={`shrink-0 ${
-                          isOverdue(todo.dueDate) && todo.status !== "completed"
-                            ? "text-red-600 font-medium"
-                            : ""
-                        }`}
-                      >
-                        Due {new Date(todo.dueDate).toLocaleDateString()}
-                        {isOverdue(todo.dueDate) &&
-                          todo.status !== "completed" &&
-                          " (Overdue)"}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 shrink-0">
-                  {todo.status === "pending" && (
-                    <Form method="POST">
-                      <input type="hidden" name="intent" value="completed" />
-                      <input type="hidden" name="todoId" value={todo.id} />
-                      <button
-                        type="submit"
-                        className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
-                      >
-                        ✓ Complete
-                      </button>
-                    </Form>
-                  )}
-                  <Link
-                    to={href("/todos/edit/:id", { id: todo.id.toString() })}
-                    className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 text-center"
-                  >
-                    Edit
-                  </Link>
-                  <Form method="POST" className="inline">
-                    <input type="hidden" name="intent" value="delete" />
-                    <input type="hidden" name="todoId" value={todo.id} />
-                    <button
-                      type="submit"
-                      className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                      onClick={(e) => {
-                        if (
-                          !window.confirm(
-                            "Are you sure you want to delete this todo?"
-                          )
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </Form>
-                </div>
-              </div>
-            </div>
+            <TodoCard key={todo.id} todo={todo} />
           ))}
         </div>
       )}

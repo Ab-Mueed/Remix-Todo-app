@@ -1,5 +1,6 @@
 import { Form, redirect, href, type ActionFunctionArgs } from "react-router";
 import { useAuth } from "~/hooks/useAuth";
+import { AuthService } from "~/services/auth.service";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -15,32 +16,17 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   try {
-    const res = await fetch("http://localhost:8055/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        password,
-        first_name,
-        last_name,
-      }),
+    await AuthService.register({
+      email,
+      password,
+      first_name,
+      last_name,
     });
 
-    if (res.ok) {
-      console.log("Registration response:"); // Debug Log
-      console.log("Registration successful! Redirecting to login...");
-      return redirect(href("/login"));
-    } else {
-      console.log("Registration Failed");
-      return {
-        error: "Registration Failed. Please Try again",
-      };
-    }
-  } catch (err: any) {
-    console.error("Registration Error:", err);
-
+    return redirect(href("/login"));
+  } catch (error) {
     return {
-      error: "Something went wrong. Please try again.",
+      error: "Registration failed. Please try again.",
     };
   }
 }
