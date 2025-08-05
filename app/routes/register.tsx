@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
       last_name,
     });
 
-    return redirect(href("/login"));
+    return redirect("/login?registered=true");
   } catch (error) {
     return {
       error: "Registration failed. Please try again.",
@@ -80,7 +80,7 @@ export default function RegisterPage({ actionData }: any) {
                 required
               />
             </div>
-            
+
             <Input
               type="email"
               name="email"
@@ -90,7 +90,7 @@ export default function RegisterPage({ actionData }: any) {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            
+
             <Input
               type="password"
               name="password"
@@ -100,7 +100,7 @@ export default function RegisterPage({ actionData }: any) {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            
+
             <Button type="submit" fullWidth size="lg">
               Create Account
             </Button>

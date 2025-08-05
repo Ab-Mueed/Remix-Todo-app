@@ -10,7 +10,12 @@ export async function loader({ request }: { request: Request }) {
   if (user) {
     return redirect(href("/"));
   }
-  return null;
+
+  // Check if user just registered
+  const url = new URL(request.url);
+  const justRegistered = url.searchParams.get('registered') === 'true';
+
+  return { justRegistered };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -41,18 +46,19 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   } catch (error) {
     // Handle different types of authentication errors gracefully
-    const errorMessage = error instanceof Error && error.message.includes('401') 
+    const errorMessage = error instanceof Error && error.message.includes('401')
       ? "Invalid email or password. Please try again."
       : "Login failed. Please check your connection and try again.";
-    
+
     return {
       error: errorMessage,
     };
   }
 }
 
-export default function LoginPage({ actionData }: any) {
+export default function LoginPage({ actionData, loaderData }: any) {
   const { email, setEmail, password, setPassword } = useAuth();
+  const { justRegistered } = loaderData || {};
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
@@ -93,6 +99,17 @@ export default function LoginPage({ actionData }: any) {
               Sign In
             </Button>
           </Form>
+
+          {justRegistered && (
+            <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-md">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-emerald-700 font-medium">Account created successfully! Please sign in.</span>
+              </div>
+            </div>
+          )}
 
           {actionData?.error && (
             <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md">
