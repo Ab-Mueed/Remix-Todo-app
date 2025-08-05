@@ -3,9 +3,6 @@ import { Link, href, Form, useLoaderData } from "react-router";
 export default function NavBar() {
   const loaderData = useLoaderData<{ user: any }>();
 
-   console.log("NavBar loader data:", loaderData);
-  console.log("User from loader data:", loaderData?.user);
-
   if (!loaderData?.user) {
     return (
       <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
