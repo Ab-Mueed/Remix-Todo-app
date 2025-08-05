@@ -39,26 +39,6 @@ export function useTodos({ loaderData }: any) {
     return dateA - dateB;
   })
 
-  // Marks a Todo as completed Function Logic
-  // function markAsCompleted(id: number) {
-  //   const updatedTodo = todos.map((todo) =>
-  //     todo.id === id ? { ...todo, status: "completed" as const } : todo
-  //   );
-  //   setTodos(updatedTodo);
-  //   localStorage.setItem("todos", JSON.stringify(updatedTodo));
-  // }
-
-  // Delete Todo Function Logic
-  // function deleteTodo(id: number) {
-  //   const confirmDelete = window.confirm(
-  //     "Are you sure you want to delete this todo?"
-  //   );
-  //   if (!confirmDelete) return;
-  //   const updatedTodo = todos.filter((todo) => todo.id !== id);
-  //   setTodos(updatedTodo);
-  //   localStorage.setItem("todos", JSON.stringify(updatedTodo));
-  // }
-
   return {
     filter,
     setFilter,
