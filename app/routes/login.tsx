@@ -1,4 +1,4 @@
-import { Form, href, redirect, type ActionFunctionArgs } from "react-router";
+import { Form, href, redirect, Link, type ActionFunctionArgs } from "react-router";
 import { useAuth } from "~/hooks/useAuth";
 import { getCurrentUser } from "~/utils/auth.server";
 import { AuthService } from "~/services/auth.service";
@@ -50,35 +50,66 @@ export default function LoginPage({ actionData }: any) {
   const { email, setEmail, password, setPassword } = useAuth();
 
   return (
-    <main className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm">
-      <h1>Login</h1>
-      <Form method="POST" className="space-y-4 sm:space-y-5">
-        <Input 
-          type="email" 
-          id="login-email"
-          name="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          label="Email" 
-          required 
-        />
-        <Input 
-          type="password" 
-          id="login-password"
-          name="password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          label="Password" 
-          required 
-        />
-        <Button type="submit" fullWidth>Login</Button>
-      </Form>
-      
-      {actionData?.error && (
-        <div className="mt-4 p-3 bg-red-100 text-red-800 rounded text-sm">
-          {actionData.error}
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-gradient-to-br from-slate-900 to-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-white font-semibold text-lg">T</span>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Welcome back</h1>
+          <p className="text-slate-600">Sign in to your account</p>
         </div>
-      )}
-    </main>
+
+        {/* Form */}
+        <div className="bg-white rounded-md shadow-sm border border-slate-200 p-6 sm:p-8">
+          <Form method="POST" className="space-y-6">
+            <Input
+              type="email"
+              id="login-email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              label="Email"
+              placeholder="Enter your email"
+              required
+            />
+            <Input
+              type="password"
+              id="login-password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              label="Password"
+              placeholder="Enter your password"
+              required
+            />
+            <Button type="submit" fullWidth size="lg">
+              Sign In
+            </Button>
+          </Form>
+
+          {actionData?.error && (
+            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-red-700 font-medium">{actionData.error}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 text-center">
+            <p className="text-slate-600 text-sm">
+              Don't have an account?{" "}
+              <Link to={href("/register")} className="text-slate-900 font-medium hover:underline">
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

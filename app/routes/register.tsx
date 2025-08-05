@@ -1,5 +1,7 @@
-import { Form, redirect, href, type ActionFunctionArgs } from "react-router";
+import { Form, redirect, href, Link, type ActionFunctionArgs } from "react-router";
 import { useAuth } from "~/hooks/useAuth";
+import Input from "~/components/ui/Input";
+import Button from "~/components/ui/Button";
 import { AuthService } from "~/services/auth.service";
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -44,80 +46,87 @@ export default function RegisterPage({ actionData }: any) {
   } = useAuth();
 
   return (
-    <main className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm">
-      <h1>User Registration</h1>
-      {/* First Name */}
-      <Form method="POST" className="space-y-4 sm:space-y-5">
-        <div>
-          <label
-            htmlFor="first_name"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            First Name
-          </label>
-          <input
-            id="first_name"
-            name="first_name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-gradient-to-br from-slate-900 to-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-white font-semibold text-lg">T</span>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Create account</h1>
+          <p className="text-slate-600">Join us to get started</p>
         </div>
-        {/* Last Name */}
-        <div>
-          <label
-            htmlFor="last_name"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Last Name
-          </label>
-          <input
-            id="last_name"
-            name="last_name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
+
+        {/* Form */}
+        <div className="bg-white rounded-md shadow-sm border border-slate-200 p-6 sm:p-8">
+          <Form method="POST" className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                id="first_name"
+                name="first_name"
+                label="First Name"
+                placeholder="John"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+              <Input
+                id="last_name"
+                name="last_name"
+                label="Last Name"
+                placeholder="Doe"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+            </div>
+            
+            <Input
+              type="email"
+              name="email"
+              label="Email"
+              placeholder="john@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            
+            <Input
+              type="password"
+              name="password"
+              label="Password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            
+            <Button type="submit" fullWidth size="lg">
+              Create Account
+            </Button>
+          </Form>
+
+          {actionData?.error && (
+            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-red-700 font-medium">{actionData.error}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 text-center">
+            <p className="text-slate-600 text-sm">
+              Already have an account?{" "}
+              <Link to={href("/login")} className="text-slate-900 font-medium hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
-        {/* Email */}
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-        {/* Password */}
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Password
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2.5 px-4 rounded hover:bg-blue-700 font-medium text-sm sm:text-base"
-        >
-          Register
-        </button>
-      </Form>
-    </main>
+      </div>
+    </div>
   );
 }

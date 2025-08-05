@@ -38,7 +38,22 @@ export async function apiRequest<T = any>(
       throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const responseData = await response.json();
+    // Check if response has content
+    const contentType = response.headers.get('content-type');
+    const hasJsonContent = contentType && contentType.includes('application/json');
+    
+    // Handle empty responses (like 201 Created with no body)
+    if (response.status === 201 || response.status === 204 || !hasJsonContent) {
+      return { data: null };
+    }
+
+    // Try to parse JSON, handle empty responses gracefully
+    const text = await response.text();
+    if (!text.trim()) {
+      return { data: null };
+    }
+
+    const responseData = JSON.parse(text);
     
     // Directus API returns { data: [...], meta: {...} } structure
     // We need to handle both the nested data structure and direct responses
