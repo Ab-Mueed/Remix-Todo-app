@@ -150,8 +150,8 @@ export default function Home({loaderData}: any) {
                     : "Create your first task to get started"}
                 </p>
                 <Link to={href("/todos/new")}>
-                  <Button variant="primary" size="lg">
-                    Create Your First Task
+                  <Button variant="primary" size="md">
+                    <span className="text-xs">Create Your First Task</span>
                   </Button>
                 </Link>
               </div>
