@@ -44,6 +44,7 @@ export class AuthService {
       return response.data;
     } catch (error) {
       // Auth failed - just return null, don't throw
+      // This prevents repeated failed requests from flooding logs
       return null;
     }
   }

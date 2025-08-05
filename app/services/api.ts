@@ -64,7 +64,8 @@ export async function apiRequest<T = any>(
     return { data: responseData };
   } catch (error) {
     // Don't spam console with auth failures - those are expected
-    if (!(error instanceof Error) || !error.message.includes('401')) {
+    if (!(error instanceof Error) || 
+        (!error.message.includes('401') && !error.message.includes('403'))) {
       console.error(`API request failed for ${endpoint}:`, error);
     }
     throw error;

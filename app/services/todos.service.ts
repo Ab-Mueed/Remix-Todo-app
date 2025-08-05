@@ -34,6 +34,7 @@ export class TodosService {
       );
       return response.data || [];
     } catch (error) {
+      // Return empty array on auth failures to prevent UI errors
       return [];
     }
   }
