@@ -18,7 +18,6 @@ export function useTodos({ loaderData }: any) {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    console.log("useTodos recieved loaderData", loaderData)
     if (loaderData?.todos) {
       setTodos(loaderData.todos);
     }
