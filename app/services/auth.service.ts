@@ -24,9 +24,9 @@ export interface RegisterData {
   last_name: string;
 }
 
-// Authentication service class
+// Auth stuff - login, register, get user info
 export class AuthService {
-  // Login user and return tokens
+  // Login and get access/refresh tokens
   static async login(credentials: LoginCredentials): Promise<LoginResponse> {
     const response = await apiRequest<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
       method: "POST",
@@ -35,7 +35,7 @@ export class AuthService {
     return response.data;
   }
 
-  // Get current user information
+  // Get user details from token
   static async getCurrentUser(token: string): Promise<User | null> {
     try {
       const response = await apiRequest<User>(API_ENDPOINTS.AUTH.ME, 
@@ -43,12 +43,12 @@ export class AuthService {
       );
       return response.data;
     } catch (error) {
-      // Silently return null for auth failures - this is expected behavior
+      // Auth failed - just return null, don't throw
       return null;
     }
   }
 
-  // Register new user
+  // Create new user account
   static async register(userData: RegisterData): Promise<void> {
     await apiRequest(API_ENDPOINTS.USERS.CREATE, {
       method: "POST",

@@ -12,7 +12,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Layout() {
   return (
-    <main className="">
+    <main>
       <NavBar />
       <Outlet />
     </main>

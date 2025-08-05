@@ -1,4 +1,4 @@
-// Base API configuration and utilities
+// API config and helper functions
 const API_BASE_URL = "http://localhost:8055";
 
 export interface ApiResponse<T = any> {
@@ -11,7 +11,7 @@ export interface ApiError {
   status?: number;
 }
 
-// Centralized fetch wrapper with authentication and error handling
+// Main API request function - handles auth, errors, etc.
 export async function apiRequest<T = any>(
   endpoint: string,
   options: RequestInit = {}
@@ -38,16 +38,15 @@ export async function apiRequest<T = any>(
       throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
     }
 
-    // Check if response has content
+    // Some endpoints return empty bodies (201, 204, etc.)
     const contentType = response.headers.get('content-type');
     const hasJsonContent = contentType && contentType.includes('application/json');
     
-    // Handle empty responses (like 201 Created with no body)
     if (response.status === 201 || response.status === 204 || !hasJsonContent) {
       return { data: null };
     }
 
-    // Try to parse JSON, handle empty responses gracefully
+    // Parse response text first to avoid JSON errors on empty responses
     const text = await response.text();
     if (!text.trim()) {
       return { data: null };
@@ -55,16 +54,16 @@ export async function apiRequest<T = any>(
 
     const responseData = JSON.parse(text);
     
-    // Directus API returns { data: [...], meta: {...} } structure
-    // We need to handle both the nested data structure and direct responses
+    // Directus wraps everything in { data: ..., meta: ... }
+    // but sometimes we get direct responses
     if (responseData && typeof responseData === 'object' && 'data' in responseData) {
       return responseData;
     }
     
-    // If it's not a Directus-style response, wrap it
+    // Wrap direct responses to match our expected format
     return { data: responseData };
   } catch (error) {
-    // Only log unexpected errors, not authentication failures
+    // Don't spam console with auth failures - those are expected
     if (!(error instanceof Error) || !error.message.includes('401')) {
       console.error(`API request failed for ${endpoint}:`, error);
     }
@@ -72,7 +71,7 @@ export async function apiRequest<T = any>(
   }
 }
 
-// Helper to add auth token to requests
+// Add Bearer token to request headers
 export function withAuth(token: string, options: RequestInit = {}): RequestInit {
   return {
     ...options,
@@ -83,7 +82,7 @@ export function withAuth(token: string, options: RequestInit = {}): RequestInit 
   };
 }
 
-// Export API endpoints for consistency
+// All our API endpoints in one place
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",

@@ -24,9 +24,9 @@ export interface UpdateTodoData {
   status?: "pending" | "completed";
 }
 
-// Todos service class
+// Todo CRUD operations
 export class TodosService {
-  // Get all todos for the authenticated user
+  // Fetch user's todos
   static async getTodos(token: string): Promise<Todo[]> {
     try {
       const response = await apiRequest<Todo[]>(API_ENDPOINTS.TASKS.LIST, 
@@ -38,7 +38,7 @@ export class TodosService {
     }
   }
 
-  // Get a single todo by ID
+  // Get one todo by ID
   static async getTodo(token: string, id: string | number): Promise<Todo | null> {
     try {
       const response = await apiRequest<Todo>(API_ENDPOINTS.TASKS.GET(id), 
@@ -50,7 +50,7 @@ export class TodosService {
     }
   }
 
-  // Create a new todo
+  // Add new todo
   static async createTodo(token: string, todoData: CreateTodoData): Promise<Todo> {
     try {
       const response = await apiRequest<Todo>(API_ENDPOINTS.TASKS.CREATE, 
@@ -65,7 +65,7 @@ export class TodosService {
     }
   }
 
-  // Update an existing todo
+  // Update todo
   static async updateTodo(token: string, id: string | number, todoData: UpdateTodoData): Promise<Todo> {
     try {
       const response = await apiRequest<Todo>(API_ENDPOINTS.TASKS.UPDATE(id), 
@@ -80,12 +80,12 @@ export class TodosService {
     }
   }
 
-  // Mark todo as completed
+  // Mark as done
   static async markAsCompleted(token: string, id: string | number): Promise<Todo> {
     return this.updateTodo(token, id, { status: "completed" });
   }
 
-  // Delete a todo
+  // Delete todo
   static async deleteTodo(token: string, id: string | number): Promise<void> {
     await apiRequest(API_ENDPOINTS.TASKS.DELETE(id), 
       withAuth(token, { method: "DELETE" })

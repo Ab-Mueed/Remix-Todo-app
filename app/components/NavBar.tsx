@@ -1,4 +1,4 @@
-import { Link, href, Form, useLoaderData } from "react-router";
+import { Form, useLoaderData } from "react-router";
 
 export default function NavBar() {
   const loaderData = useLoaderData<{ user: any }>();
