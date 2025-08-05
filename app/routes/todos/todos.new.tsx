@@ -1,8 +1,8 @@
 import type { Route } from "./+types/todos.new";
-import { Form, type ActionFunctionArgs, redirect } from "react-router";
-import { useNewTodoForm } from "../../hooks/useNewTodoForm";
-import { Link, href } from "react-router";
+import { type ActionFunctionArgs, redirect, href } from "react-router";
 import { getAuthToken } from "~/utils/auth.server";
+import { TodosService } from "~/services/todos.service";
+import TodoForm from "~/components/TodoForm";
 
 export async function action({ request }: ActionFunctionArgs) {
   const token = getAuthToken(request);
@@ -22,136 +22,26 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   try {
-    console.log("Creating new todo"); // debug log
-
-    const response = await fetch("http://localhost:8055/items/tasks", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        description,
-        dueDate: dueDate + "T10:00:00",
-        status: "pending",
-      }),
+    await TodosService.createTodo(token, {
+      title,
+      description,
+      dueDate: dueDate + "T10:00:00",
+      status: "pending",
     });
 
-    console.log("Create todo response status:", response.status);
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Todo created successfully:", data);
-
-      return redirect(href("/"));
-    } else {
-      const errorData = await response.json();
-      console.error("Failed to create todo:", errorData);
-      return {
-        error: "failed to create tasks. Please try again.",
-      };
-    }
+    return redirect(href("/"));
   } catch (error) {
-    console.error("Error creating todo:", error);
     return {
-      error: "An error occured while creating the task.",
+      error: "Failed to create task. Please try again.",
     };
   }
 }
 
 export default function NewToDoPage({ actionData }: Route.ComponentProps) {
-  const { title, setTitle, description, setDescription, message } =
-    useNewTodoForm({
-      actionData,
-    });
-
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-      <div className="mb-6">
-        <Link
-          to={href("/")}
-          className="text-blue-600 hover:text-blue-800 mb-4 inline-block text-sm sm:text-base"
-        >
-          ← Back to Tasks
-        </Link>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-          Create New Task
-        </h1>
-        <p className="text-gray-600">Add a new task to stay organized</p>
-      </div>
-
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm">
-        <Form method="POST" className="space-y-4 sm:space-y-5">
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Title
-            </label>
-            <input
-              name="title"
-              id="title"
-              type="text"
-              placeholder="Enter task title..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Description
-            </label>
-            <textarea
-              name="description"
-              id="description"
-              rows={4}
-              placeholder="Describe your task..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="dueDate"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Due Date
-            </label>
-            <input
-              type="date"
-              name="dueDate"
-              id="dueDate"
-              min={new Date().toISOString().split("T")[0]}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2.5 px-4 rounded hover:bg-blue-700 font-medium text-sm sm:text-base"
-          >
-            Create Task
-          </button>
-        </Form>
-
-        {message && (
-          <div className="mt-4 p-3 bg-green-100 text-green-800 rounded text-sm">
-            {message}
-          </div>
-        )}
-      </div>
-    </div>
+    <TodoForm
+      mode="create"
+      error={actionData?.error}
+    />
   );
 }
