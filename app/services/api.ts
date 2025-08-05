@@ -64,7 +64,10 @@ export async function apiRequest<T = any>(
     // If it's not a Directus-style response, wrap it
     return { data: responseData };
   } catch (error) {
-    console.error(`API request failed for ${endpoint}:`, error);
+    // Only log unexpected errors, not authentication failures
+    if (!(error instanceof Error) || !error.message.includes('401')) {
+      console.error(`API request failed for ${endpoint}:`, error);
+    }
     throw error;
   }
 }

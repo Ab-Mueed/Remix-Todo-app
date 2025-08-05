@@ -40,8 +40,13 @@ export async function action({ request }: ActionFunctionArgs) {
       headers,
     });
   } catch (error) {
+    // Handle different types of authentication errors gracefully
+    const errorMessage = error instanceof Error && error.message.includes('401') 
+      ? "Invalid email or password. Please try again."
+      : "Login failed. Please check your connection and try again.";
+    
     return {
-      error: "Invalid email or password. Please try again.",
+      error: errorMessage,
     };
   }
 }

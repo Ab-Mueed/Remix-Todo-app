@@ -28,15 +28,11 @@ export interface RegisterData {
 export class AuthService {
   // Login user and return tokens
   static async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    try {
-      const response = await apiRequest<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
-        method: "POST",
-        body: JSON.stringify(credentials),
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiRequest<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    return response.data;
   }
 
   // Get current user information
@@ -47,6 +43,7 @@ export class AuthService {
       );
       return response.data;
     } catch (error) {
+      // Silently return null for auth failures - this is expected behavior
       return null;
     }
   }

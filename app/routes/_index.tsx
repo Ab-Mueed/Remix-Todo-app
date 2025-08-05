@@ -18,12 +18,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(href("/login"));
   }
 
-  try {
-    const todos = await TodosService.getTodos(token);
-    return { todos };
-  } catch (error) {
-    return { todos: [] };
-  }
+  const todos = await TodosService.getTodos(token);
+  return { todos };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -41,19 +37,19 @@ export async function action({ request }: ActionFunctionArgs) {
       await TodosService.deleteTodo(token, todoId);
     }
   } catch (error) {
-    // Action failed silently
+    // Silently handle action failures - user will see the change didn't persist
   }
   return null;
 }
 
-export default function Home({loaderData}: any) {
+export default function Home({ loaderData }: any) {
   const { filter, setFilter, search, setSearch, sortedTodos } =
     useTodos({ loaderData });
 
   return (
     <div className="flex min-h-screen bg-slate-50">
       {/* Desktop Sidebar */}
-      <Sidebar 
+      <Sidebar
         search={search}
         setSearch={setSearch}
         filter={filter}
@@ -84,7 +80,7 @@ export default function Home({loaderData}: any) {
                 </button>
               </Link>
             </div>
-            
+
             {/* Filter Tabs */}
             <div className="flex gap-2">
               {[
@@ -95,11 +91,10 @@ export default function Home({loaderData}: any) {
                 <button
                   key={option.key}
                   onClick={() => setFilter(option.key as any)}
-                  className={`flex-1 px-3 py-2 rounded-full transition-all duration-200 flex items-center justify-center space-x-1 text-xs font-medium ${
-                    filter === option.key
-                      ? "bg-slate-900 text-white shadow-md"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200"
-                  }`}
+                  className={`flex-1 px-3 py-2 rounded-full transition-all duration-200 flex items-center justify-center space-x-1 text-xs font-medium ${filter === option.key
+                    ? "bg-slate-900 text-white shadow-md"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200"
+                    }`}
                 >
                   <span>{option.icon}</span>
                   <span>{option.label}</span>
