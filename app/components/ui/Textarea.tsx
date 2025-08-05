@@ -16,8 +16,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     rows = 4,
     ...props 
   }, ref) => {
-    const baseClasses = "px-3 py-2 border rounded focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 resize-none";
-    const errorClasses = error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-300";
+    const baseClasses = "px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm resize-none";
+    const errorClasses = error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-slate-200";
     const widthClass = fullWidth ? "w-full" : "";
     
     const textareaClasses = [baseClasses, errorClasses, widthClass, className].filter(Boolean).join(" ");
@@ -27,7 +27,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label
             htmlFor={id}
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-slate-700 mb-2"
           >
             {label}
           </label>
@@ -40,7 +40,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-2 text-sm text-red-600">{error}</p>
         )}
       </div>
     );
