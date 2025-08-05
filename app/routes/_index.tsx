@@ -1,10 +1,9 @@
 import { getAuthToken } from "~/utils/auth.server";
 import { TodosService } from "~/services/todos.service";
 import { useTodos } from "../hooks/useTodos";
-import type { Filter } from "../hooks/useTodos";
 import TodoCard from "~/components/TodoCard";
+import Sidebar from "~/components/Sidebar";
 import Button from "~/components/ui/Button";
-import Input from "~/components/ui/Input";
 import {
   Link,
   href,
@@ -52,88 +51,120 @@ export default function Home({loaderData}: any) {
     useTodos({ loaderData });
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-          Your Tasks
-        </h1>
-        <p className="text-gray-600 mb-4">Manage your todos efficiently</p>
+    <div className="flex min-h-screen bg-slate-50">
+      {/* Desktop Sidebar */}
+      <Sidebar 
+        search={search}
+        setSearch={setSearch}
+        filter={filter}
+        setFilter={setFilter}
+      />
 
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
-          <Input
-            type="text"
-            id="search-todos"
-            placeholder="Search by title or description..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            fullWidth={false}
-            className="sm:flex-1"
-          />
-          <Link
-            to={href("/todos/new")}
-            className="inline-block"
-          >
-            <Button variant="primary">
-              + Add Task
-            </Button>
-          </Link>
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        {/* Mobile Header with Search and Filters */}
+        <div className="lg:hidden bg-white border-b border-slate-200 p-4 sticky top-0 z-10">
+          <div className="space-y-4">
+            {/* Search */}
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search tasks..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm text-sm"
+                />
+              </div>
+              <Link to={href("/todos/new")}>
+                <button className="bg-slate-900 text-white px-6 py-3 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 min-h-[48px] inline-flex items-center justify-center font-medium">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </Link>
+            </div>
+            
+            {/* Filter Tabs */}
+            <div className="flex gap-2">
+              {[
+                { key: "all", label: "All", icon: "📋" },
+                { key: "pending", label: "Pending", icon: "⏳" },
+                { key: "completed", label: "Done", icon: "✅" },
+              ].map((option) => (
+                <button
+                  key={option.key}
+                  onClick={() => setFilter(option.key as any)}
+                  className={`flex-1 px-4 py-2 rounded-full transition-all duration-200 flex items-center justify-center space-x-2 text-sm font-medium ${
+                    filter === option.key
+                      ? "bg-slate-900 text-white shadow-md"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200"
+                  }`}
+                >
+                  <span>{option.icon}</span>
+                  <span>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-6">
-          {["all", "pending", "completed"].map((f) => (
-            <Button
-              key={f}
-              onClick={() => setFilter(f as Filter)}
-              variant={filter === f ? "primary" : "secondary"}
-              size="sm"
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </Button>
-          ))}
+        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
+          {/* Desktop Header */}
+          <div className="hidden lg:block mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">
+              Your Tasks
+            </h1>
+            <p className="text-slate-600">
+              {filter === "all" && "All your tasks"}
+              {filter === "pending" && "Tasks waiting to be completed"}
+              {filter === "completed" && "Your completed tasks"}
+            </p>
+          </div>
+
+          {/* Content */}
+          {sortedTodos.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="bg-white rounded-md shadow-sm border border-slate-200 p-12 max-w-md mx-auto">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg
+                    className="w-10 h-10 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  {search ? "No tasks found" : "No tasks yet"}
+                </h3>
+                <p className="text-slate-600 mb-6">
+                  {search
+                    ? "Try adjusting your search terms"
+                    : "Create your first task to get started"}
+                </p>
+                <Link to={href("/todos/new")}>
+                  <Button variant="primary" size="lg">
+                    Create Your First Task
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {sortedTodos.map((todo) => (
+                <TodoCard key={todo.id} todo={todo} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      {sortedTodos.length === 0 ? (
-        <div className="text-center py-8 sm:py-12">
-          <div className="text-gray-400 mb-4">
-            <svg
-              className="w-12 h-12 sm:w-16 sm:h-16 mx-auto"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-800 mb-2">
-            No tasks found
-          </h3>
-          <p className="text-gray-600 mb-4 px-4">
-            {search
-              ? "Try adjusting your search terms"
-              : "Create your first task to get started"}
-          </p>
-          <Link
-            to={href("/todos/new")}
-            className="inline-block"
-          >
-            <Button variant="primary">
-              Create Your First Task
-            </Button>
-          </Link>
-        </div>
-      ) : (
-        <div className="space-y-3 sm:space-y-4">
-          {sortedTodos.map((todo) => (
-            <TodoCard key={todo.id} todo={todo} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
