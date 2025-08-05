@@ -10,3 +10,8 @@
 *.docs.md
 documentation/
 typescript-guide.md
+
+# Environment variables
+.env
+.env.local
+.env.production

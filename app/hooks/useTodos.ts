@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 
 export type Todo = {
   id: number;
@@ -12,39 +13,74 @@ export type Todo = {
 
 export type Filter = "all" | "pending" | "completed";
 
-export function useTodos({ loaderData }: any) {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [filter, setFilter] = useState<Filter>("all");
-  const [search, setSearch] = useState("");
+interface UseTodosProps {
+  loaderData: {
+    todos: Todo[];
+    search?: string;
+    filter?: string;
+  };
+}
 
-  useEffect(() => {
-    if (loaderData?.todos) {
-      setTodos(loaderData.todos);
+export function useTodos({ loaderData }: UseTodosProps) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Initialize state from URL parameters or loader data
+  const [filter, setFilterState] = useState<Filter>(
+    (loaderData.filter as Filter) || "all"
+  );
+  const [search, setSearchState] = useState(
+    loaderData.search || ""
+  );
+
+  // Update URL when filter or search changes
+  const updateURL = (newSearch: string, newFilter: Filter) => {
+    const params = new URLSearchParams();
+    
+    if (newSearch.trim()) {
+      params.set("search", newSearch.trim());
     }
-  }, [loaderData]);
+    
+    if (newFilter !== "all") {
+      params.set("filter", newFilter);
+    }
+    
+    const searchString = params.toString();
+    const newURL = searchString ? `/?${searchString}` : "/";
+    
+    navigate(newURL, { replace: true });
+  };
 
-  // Filter todo based on status and/or title & description
-  const filteredTodos = todos.filter((todo: any) => {
-    const statusMatch = filter === "all" || todo.status === filter;
-    const searchMatch =
-      todo.title.toLowerCase().includes(search.toLowerCase()) ||
-      todo.description.toLowerCase().includes(search.toLowerCase());
-    return statusMatch && searchMatch;
+  // Debounced search update
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      updateURL(search, filter);
+    }, 500); // 500ms debounce for search
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  // Immediate filter update
+  const setFilter = (newFilter: Filter) => {
+    setFilterState(newFilter);
+    updateURL(search, newFilter);
+  };
+
+  // Search update (debounced via useEffect above)
+  const setSearch = (newSearch: string) => {
+    setSearchState(newSearch);
+  };
+
+  // Sort todos by creation date (newest first)
+  const sortedTodos = [...(loaderData.todos || [])].sort((a, b) => {
+    return new Date(b.date_created).getTime() - new Date(a.date_created).getTime();
   });
-
-  // Sort Todos based on due date
-  const sortedTodos = [...filteredTodos].sort((a: any,b: any) => {
-    const dateA = new Date(a.dueDate || "").getTime();
-    const dateB = new Date(b.dueDate || "").getTime();
-    return dateA - dateB;
-  })
 
   return {
     filter,
     setFilter,
     search,
     setSearch,
-    filteredTodos,
     sortedTodos,
   };
 }

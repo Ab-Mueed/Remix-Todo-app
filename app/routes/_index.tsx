@@ -18,8 +18,34 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(href("/login"));
   }
 
-  const todos = await TodosService.getTodos(token);
-  return { todos };
+  // Get search and filter parameters from URL
+  const url = new URL(request.url);
+  const search = url.searchParams.get("search") || "";
+  const filter = url.searchParams.get("filter") || "all";
+
+  let todos: any[] = [];
+
+  try {
+    // Use server-side filtering and searching
+    if (search && filter !== "all") {
+      // Both search and filter
+      todos = await TodosService.searchAndFilterTodos(token, search, filter as "pending" | "completed");
+    } else if (search) {
+      // Only search
+      todos = await TodosService.searchTodos(token, search);
+    } else if (filter !== "all") {
+      // Only filter
+      todos = await TodosService.getTodosByStatus(token, filter as "pending" | "completed");
+    } else {
+      // All todos
+      todos = await TodosService.getTodos(token);
+    }
+  } catch (error) {
+    // Fallback to getting all todos if server-side filtering fails
+    todos = await TodosService.getTodos(token);
+  }
+
+  return { todos, search, filter };
 }
 
 export async function action({ request }: ActionFunctionArgs) {

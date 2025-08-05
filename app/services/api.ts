@@ -1,5 +1,5 @@
 // API config and helper functions
-const API_BASE_URL = "http://localhost:8055";
+const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8055";
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -17,7 +17,7 @@ export async function apiRequest<T = any>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const defaultHeaders: HeadersInit = {
     "Content-Type": "application/json",
   };
@@ -32,7 +32,7 @@ export async function apiRequest<T = any>(
 
   try {
     const response = await fetch(url, config);
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
@@ -41,7 +41,7 @@ export async function apiRequest<T = any>(
     // Some endpoints return empty bodies (201, 204, etc.)
     const contentType = response.headers.get('content-type');
     const hasJsonContent = contentType && contentType.includes('application/json');
-    
+
     if (response.status === 201 || response.status === 204 || !hasJsonContent) {
       return { data: null };
     }
@@ -53,13 +53,13 @@ export async function apiRequest<T = any>(
     }
 
     const responseData = JSON.parse(text);
-    
+
     // Directus wraps everything in { data: ..., meta: ... }
     // but sometimes we get direct responses
     if (responseData && typeof responseData === 'object' && 'data' in responseData) {
       return responseData;
     }
-    
+
     // Wrap direct responses to match our expected format
     return { data: responseData };
   } catch (error) {

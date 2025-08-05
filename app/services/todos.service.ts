@@ -91,4 +91,67 @@ export class TodosService {
       withAuth(token, { method: "DELETE" })
     );
   }
+
+  // Server-side search
+  static async searchTodos(token: string, searchTerm: string): Promise<Todo[]> {
+    try {
+      const params = new URLSearchParams({
+        search: searchTerm
+      });
+      
+      const response = await apiRequest<Todo[]>(`${API_ENDPOINTS.TASKS.LIST}?${params}`, 
+        withAuth(token, { method: "GET" })
+      );
+      return response.data || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  // Server-side filtering by status
+  static async getTodosByStatus(token: string, status: "pending" | "completed"): Promise<Todo[]> {
+    try {
+      const params = new URLSearchParams({
+        'filter[status][_eq]': status
+      });
+      
+      const response = await apiRequest<Todo[]>(`${API_ENDPOINTS.TASKS.LIST}?${params}`, 
+        withAuth(token, { method: "GET" })
+      );
+      return response.data || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  // Combined search and filter on server
+  static async searchAndFilterTodos(
+    token: string,
+    searchTerm?: string, 
+    status?: "pending" | "completed"
+  ): Promise<Todo[]> {
+    try {
+      const params = new URLSearchParams();
+      
+      if (searchTerm && searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+      }
+      
+      if (status) {
+        params.append('filter[status][_eq]', status);
+      }
+      
+      // If no filters, just get all todos
+      const endpoint = params.toString() 
+        ? `${API_ENDPOINTS.TASKS.LIST}?${params}`
+        : API_ENDPOINTS.TASKS.LIST;
+      
+      const response = await apiRequest<Todo[]>(endpoint, 
+        withAuth(token, { method: "GET" })
+      );
+      return response.data || [];
+    } catch (error) {
+      return [];
+    }
+  }
 } 
