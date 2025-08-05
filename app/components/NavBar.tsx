@@ -26,16 +26,8 @@ export default function NavBar() {
           <span className="text-base sm:text-lg font-semibold text-slate-900">TodoApp</span>
         </div>
 
-        {/* Right side - My Tasks, User info and logout */}
+        {/* Right side - User info and logout */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* My Tasks Link */}
-          <Link 
-            to={href("/")} 
-            className="hidden sm:block text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors duration-200"
-          >
-            My Tasks
-          </Link>
-
           {/* User Info - Mobile and Desktop */}
           <div className="flex items-center space-x-2 sm:space-x-3 bg-slate-50 px-2 py-1.5 sm:px-4 sm:py-2 rounded-full">
             <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-slate-300 to-slate-400 rounded-full flex items-center justify-center">
