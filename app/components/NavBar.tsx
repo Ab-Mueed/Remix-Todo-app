@@ -12,9 +12,9 @@ export default function NavBar() {
         bg="white"
         style={{
           borderBottom: '1px solid var(--mantine-color-gray-3)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 50
+          position: 'relative',
+          zIndex: 50,
+          flexShrink: 0
         }}
         px="xl"
         py="md"
@@ -34,9 +34,9 @@ export default function NavBar() {
       bg="white"
       style={{
         borderBottom: '1px solid var(--mantine-color-gray-3)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50
+        position: 'relative',
+        zIndex: 50,
+        flexShrink: 0
       }}
       px="xl"
       py="md"

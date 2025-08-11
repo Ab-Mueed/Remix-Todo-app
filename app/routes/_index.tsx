@@ -99,27 +99,40 @@ export default function Home({ loaderData }: any) {
   ];
 
   return (
-    <Box style={{ display: 'flex', minHeight: '100vh' }} bg="gray.0">
-      {/* Desktop Sidebar */}
-      <Sidebar
-        search={search}
-        setSearch={setSearch}
-        filter={filter}
-        setFilter={setFilter}
-      />
+    <div style={{ 
+      height: '100%', 
+      display: 'flex', 
+      backgroundColor: 'var(--mantine-color-gray-0)',
+      overflow: 'hidden'
+    }}>
+      {/* Desktop Sidebar - Only show on large screens */}
+      <Box visibleFrom="lg" className="sidebar-wrapper">
+        <Sidebar
+          search={search}
+          setSearch={setSearch}
+          filter={filter}
+          setFilter={setFilter}
+        />
+      </Box>
 
       {/* Main Content */}
-      <Box flex={1} style={{ overflow: 'auto' }}>
+      <div style={{ 
+        flex: 1, 
+        minWidth: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden'
+      }}>
         {/* Mobile Header with Search and Filters */}
         <Box
           hiddenFrom="lg"
           bg="white"
           p="md"
-          pos="sticky"
-          top={0}
           style={{
             borderBottom: '1px solid var(--mantine-color-gray-3)',
-            zIndex: 10
+            zIndex: 10,
+            flexShrink: 0
           }}
         >
           <Stack gap="md">
@@ -174,59 +187,66 @@ export default function Home({ loaderData }: any) {
           </Stack>
         </Box>
 
-        <Container size="xl" px="md" py="xl">
-          {/* Desktop Header */}
-          <Box visibleFrom="lg" mb="xl">
-            <Text size="xl" fw={700} mb="xs" c="black">
-              Your Tasks
-            </Text>
-            <Text size="sm" c="gray.7">
-              {filter === "all" && "All your tasks"}
-              {filter === "pending" && "Tasks waiting to be completed"}
-              {filter === "completed" && "Your completed tasks"}
-            </Text>
-          </Box>
+        {/* Scrollable Content Container */}
+        <div style={{ 
+          flex: 1, 
+          overflow: 'auto',
+          backgroundColor: 'var(--mantine-color-gray-0)'
+        }}>
+          <Container size="xl" px="md" py="xl">
+            {/* Desktop Header */}
+            <Box visibleFrom="lg" mb="xl">
+              <Text size="xl" fw={700} mb="xs" c="black">
+                Your Tasks
+              </Text>
+              <Text size="sm" c="gray.7">
+                {filter === "all" && "All your tasks"}
+                {filter === "pending" && "Tasks waiting to be completed"}
+                {filter === "completed" && "Your completed tasks"}
+              </Text>
+            </Box>
 
-          {/* Content */}
-          {sortedTodos.length === 0 ? (
-            <Center py="xl">
-              <Paper shadow="sm" radius="md" withBorder bg="white" p="xl" maw={400} w="100%">
-                <Stack align="center" gap="lg">
-                  <Avatar
-                    size="xl"
-                    radius="xl"
-                    color="gray"
-                    variant="light"
-                  >
-                    <IconClipboard size={40} stroke={1.5} />
-                  </Avatar>
-                  <Stack align="center" gap="xs">
-                    <Text size="lg" fw={600} c="black">
-                      {search ? "No tasks found" : "No tasks yet"}
-                    </Text>
-                    <Text size="sm" c="gray.7" ta="center">
-                      {search
-                        ? "Try adjusting your search terms"
-                        : "Create your first task to get started"}
-                    </Text>
+            {/* Content */}
+            {sortedTodos.length === 0 ? (
+              <Center py="xl">
+                <Paper shadow="sm" radius="md" withBorder bg="white" p="xl" maw={400} w="100%">
+                  <Stack align="center" gap="lg">
+                    <Avatar
+                      size="xl"
+                      radius="xl"
+                      color="gray"
+                      variant="light"
+                    >
+                      <IconClipboard size={40} stroke={1.5} />
+                    </Avatar>
+                    <Stack align="center" gap="xs">
+                      <Text size="lg" fw={600} c="black">
+                        {search ? "No tasks found" : "No tasks yet"}
+                      </Text>
+                      <Text size="sm" c="gray.7" ta="center">
+                        {search
+                          ? "Try adjusting your search terms"
+                          : "Create your first task to get started"}
+                      </Text>
+                    </Stack>
+                    <Link to={href("/todos/new")} style={{ textDecoration: 'none' }}>
+                      <Button variant="primary" size="md">
+                        Create Your First Task
+                      </Button>
+                    </Link>
                   </Stack>
-                  <Link to={href("/todos/new")} style={{ textDecoration: 'none' }}>
-                    <Button variant="primary" size="md">
-                      Create Your First Task
-                    </Button>
-                  </Link>
-                </Stack>
-              </Paper>
-            </Center>
-          ) : (
-            <Stack gap="md">
-              {sortedTodos.map((todo) => (
-                <TodoCard key={todo.id} todo={todo} />
-              ))}
-            </Stack>
-          )}
-        </Container>
-      </Box>
-    </Box>
+                </Paper>
+              </Center>
+            ) : (
+              <Stack gap="md">
+                {sortedTodos.map((todo) => (
+                  <TodoCard key={todo.id} todo={todo} />
+                ))}
+              </Stack>
+            )}
+          </Container>
+        </div>
+      </div>
+    </div>
   );
 }

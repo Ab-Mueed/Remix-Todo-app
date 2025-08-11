@@ -82,13 +82,6 @@ export default function Sidebar({ search, setSearch, filter, setFilter }: Sideba
           ))}
         </Stack>
       </Box>
-
-      {/* Footer */}
-      <Box p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
-        <Text size="xs" c="gray.6" ta="center">
-          Stay organized and productive
-        </Text>
-      </Box>
     </Box>
   );
 }
