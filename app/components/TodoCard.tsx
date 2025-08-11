@@ -1,4 +1,6 @@
 import { Form, Link, href } from "react-router";
+import { Paper, Box, Group, Text, Badge, Stack, Flex } from "@mantine/core";
+import { IconClock, IconCalendar, IconCheck, IconEdit, IconTrash } from "@tabler/icons-react";
 import Button from "./ui/Button";
 import type { Todo } from "~/services/todos.service";
 
@@ -16,112 +18,130 @@ export default function TodoCard({ todo }: TodoCardProps) {
   const overdue = isOverdue(todo.dueDate) && !isCompleted;
 
   return (
-    <div
-      className={`bg-white border border-slate-200 rounded-md shadow-sm hover:shadow-md transition-all duration-200 ${overdue ? "border-l-4 border-l-red-500" : ""}`}
+    <Paper
+      shadow="md"
+      radius="md"
+      bg="white"
+      style={{
+        borderLeft: overdue ? '4px solid var(--mantine-color-red-6)' : undefined
+      }}
     >
-      <div className="p-6">
-        <div className={`flex items-start justify-between gap-4 ${isCompleted ? "opacity-60" : ""}`}>
-          <div className="flex-1 min-w-0">
-            {/* Header */}
-            <div className="flex items-start gap-3 mb-3">
-              <div className="flex-1 min-w-0">
-                <h3
-                  className={`text-base sm:text-lg font-semibold text-slate-900 break-words ${isCompleted ? "line-through text-slate-400" : ""
-                    }`}
-                >
-                  {todo.title}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span
-                  className={`px-2.5 py-1 text-xs font-medium rounded-full ${isCompleted
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "bg-amber-100 text-amber-700"
-                    }`}
-                >
-                  {isCompleted ? "Completed" : "Pending"}
-                </span>
-                {overdue && (
-                  <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">
-                    Overdue
-                  </span>
+      <Box p="xl">
+        <Box style={{ opacity: isCompleted ? 0.6 : 1 }}>
+          <Flex justify="space-between" align="flex-start" gap="md" mb="sm">
+            <Box flex={1} style={{ minWidth: 0 }}>
+              {/* Header */}
+              <Group justify="space-between" align="flex-start" mb="sm">
+                <Box flex={1} style={{ minWidth: 0 }}>
+                  <Text
+                    size="lg"
+                    fw={600}
+                    c={isCompleted ? 'gray.6' : 'black'}
+                    style={{
+                      textDecoration: isCompleted ? 'line-through' : 'none',
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    {todo.title}
+                  </Text>
+                </Box>
+                <Group gap="xs" style={{ flexShrink: 0 }}>
+                  <Badge
+                    color={isCompleted ? "teal" : "orange"}
+                    variant="filled"
+                    size="sm"
+                    radius="xl"
+                  >
+                    {isCompleted ? "Completed" : "Pending"}
+                  </Badge>
+                  {overdue && (
+                    <Badge color="red" variant="filled" size="sm" radius="xl">
+                      Overdue
+                    </Badge>
+                  )}
+                </Group>
+              </Group>
+
+              {/* Description */}
+              <Text
+                size="sm"
+                c="gray.7"
+                mb="md"
+                style={{
+                  wordBreak: 'break-word',
+                  lineHeight: 1.6
+                }}
+              >
+                {todo.description}
+              </Text>
+
+              {/* Metadata */}
+              <Group gap="md" style={{ flexWrap: 'wrap' }}>
+                <Group gap="xs">
+                  <IconClock size={12} color="var(--mantine-color-gray-6)" />
+                  <Text size="xs" c="gray.6">
+                    Created {new Date(todo.date_created).toLocaleDateString()}
+                  </Text>
+                </Group>
+                {todo.dueDate && (
+                  <Group gap="xs">
+                    <IconCalendar size={12} color={overdue ? "var(--mantine-color-red-6)" : "var(--mantine-color-gray-6)"} />
+                    <Text 
+                      size="xs" 
+                      c={overdue ? "red.7" : "gray.6"}
+                      fw={overdue ? 600 : 400}
+                    >
+                      Due {new Date(todo.dueDate).toLocaleDateString()}
+                      {overdue && " (Overdue)"}
+                    </Text>
+                  </Group>
                 )}
-              </div>
-            </div>
-
-            {/* Description */}
-            <p
-              className="text-sm sm:text-base text-slate-600 mb-4 break-words leading-relaxed"
-            >
-              {todo.description}
-            </p>
-
-            {/* Metadata */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
-              <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Created {new Date(todo.date_created).toLocaleDateString()}
-              </span>
-              {todo.dueDate && (
-                <span className={`flex items-center gap-1 ${overdue ? "text-red-600 font-medium" : ""}`}>
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Due {new Date(todo.dueDate).toLocaleDateString()}
-                  {overdue && " (Overdue)"}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
+              </Group>
+            </Box>
+          </Flex>
+        </Box>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-2 sm:gap-3 mt-4 pt-4 border-t border-slate-100">
-          {!isCompleted && (
-            <Form method="POST" className="inline">
-              <input type="hidden" name="intent" value="completed" />
+        <Box pt="md" mt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+          <Group justify="flex-end" gap="sm">
+            {!isCompleted && (
+              <Form method="POST" style={{ display: 'inline' }}>
+                <input type="hidden" name="intent" value="completed" />
+                <input type="hidden" name="todoId" value={todo.id} />
+                <Button variant="success" size="sm" type="submit">
+                  <IconCheck size={14} style={{ marginRight: '4px' }} />
+                  <Text size="xs">Complete</Text>
+                </Button>
+              </Form>
+            )}
+
+            <Link to={href("/todos/edit/:id", { id: todo.id.toString() })} style={{ display: 'inline-block', textDecoration: 'none' }}>
+              <Button variant="secondary" size="sm">
+                <IconEdit size={14} style={{ marginRight: '4px' }} />
+                <Text size="xs">Edit</Text>
+              </Button>
+            </Link>
+
+            <Form method="POST" style={{ display: 'inline' }}>
+              <input type="hidden" name="intent" value="delete" />
               <input type="hidden" name="todoId" value={todo.id} />
-              <Button type="submit" variant="success" size="sm">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-xs sm:text-sm">Complete</span>
+              <Button 
+                variant="danger" 
+                size="sm" 
+                type="submit"
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (!window.confirm("Are you sure you want to delete this task?")) {
+                    e.preventDefault();
+                  }
+                }}
+              >
+                <IconTrash size={14} style={{ marginRight: '4px' }} />
+                <Text size="xs">Delete</Text>
               </Button>
             </Form>
-          )}
-
-          <Link to={href("/todos/edit/:id", { id: todo.id.toString() })} className="inline-block">
-            <Button variant="secondary" size="sm">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              <span className="text-xs sm:text-sm">Edit</span>
-            </Button>
-          </Link>
-
-          <Form method="POST" className="inline">
-            <input type="hidden" name="intent" value="delete" />
-            <input type="hidden" name="todoId" value={todo.id} />
-            <Button
-              type="submit"
-              variant="danger"
-              size="sm"
-              onClick={(e) => {
-                if (!window.confirm("Are you sure you want to delete this task?")) {
-                  e.preventDefault();
-                }
-              }}
-            >
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-              <span className="text-xs sm:text-sm">Delete</span>
-            </Button>
-          </Form>
-        </div>
-      </div>
-    </div>
+          </Group>
+        </Box>
+      </Box>
+    </Paper>
   );
 } 

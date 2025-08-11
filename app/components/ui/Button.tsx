@@ -1,49 +1,128 @@
-import { type ButtonHTMLAttributes, forwardRef } from "react";
+import { Button as MantineButton, type ButtonProps as MantineButtonProps } from "@mantine/core";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<MantineButtonProps, 'variant' | 'size'>, Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'> {
   variant?: "primary" | "secondary" | "danger" | "success";
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ 
-    variant = "primary", 
-    size = "md", 
+  ({
+    variant = "primary",
+    size = "md",
     fullWidth = false,
-    className = "",
     children,
-    ...props 
+    ...props
   }, ref) => {
-    const baseClasses = "font-medium rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center";
-    
-    const variantClasses = {
-      primary: "bg-slate-900 text-white hover:bg-slate-800 focus:ring-slate-500 shadow-sm hover:shadow-md",
-      secondary: "bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-500 border border-slate-200 shadow-sm hover:shadow-md",
-      danger: "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500 shadow-sm hover:shadow-md",
-      success: "bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-500 shadow-sm hover:shadow-md",
+    const getVariantProps = () => {
+      switch (variant) {
+        case "primary":
+          return {
+            variant: "filled" as const,
+            color: "blue",
+            styles: {
+              root: {
+                color: 'white',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+                  transform: 'translateY(-1px)'
+                }
+              }
+            }
+          };
+        case "secondary":
+          return {
+            variant: "filled" as const,
+            color: "gray",
+            styles: {
+              root: {
+                backgroundColor: 'white',
+                color: 'black',
+                border: 'none',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  backgroundColor: 'var(--mantine-color-gray-0)',
+                  color: 'black',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+                  transform: 'translateY(-1px)'
+                }
+              }
+            }
+          };
+        case "danger":
+          return {
+            variant: "filled" as const,
+            color: "red",
+            styles: {
+              root: {
+                color: 'white',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+                  transform: 'translateY(-1px)'
+                }
+              }
+            }
+          };
+        case "success":
+          return {
+            variant: "filled" as const,
+            color: "teal",
+            styles: {
+              root: {
+                color: 'white',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+                  transform: 'translateY(-1px)'
+                }
+              }
+            }
+          };
+        default:
+          return {
+            variant: "filled" as const,
+            color: "blue",
+            styles: {
+              root: {
+                color: 'white',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                '&:hover': {
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+                  transform: 'translateY(-1px)'
+                }
+              }
+            }
+          };
+      }
     };
 
-    const sizeClasses = {
-      sm: "px-4 py-2 text-sm min-h-[32px]",
-      md: "px-6 py-2.5 text-sm min-h-[40px]",
-      lg: "px-8 py-3 text-base min-h-[48px]",
+    const getSizeProps = () => {
+      switch (size) {
+        case "sm":
+          return { size: "sm" as const, h: 32 };
+        case "md":
+          return { size: "md" as const, h: 40 };
+        case "lg":
+          return { size: "lg" as const, h: 48 };
+        default:
+          return { size: "md" as const, h: 40 };
+      }
     };
-
-    const widthClass = fullWidth ? "w-full" : "";
-
-    const classes = [
-      baseClasses,
-      variantClasses[variant],
-      sizeClasses[size],
-      widthClass,
-      className,
-    ].filter(Boolean).join(" ");
 
     return (
-      <button ref={ref} className={classes} {...props}>
+      <MantineButton
+        ref={ref}
+        fullWidth={fullWidth}
+        radius="sm"
+        {...getVariantProps()}
+        {...getSizeProps()}
+        {...props}
+      >
         {children}
-      </button>
+      </MantineButton>
     );
   }
 );

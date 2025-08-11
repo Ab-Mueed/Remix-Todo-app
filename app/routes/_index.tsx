@@ -3,6 +3,18 @@ import { TodosService } from "~/services/todos.service";
 import { useTodos } from "../hooks/useTodos";
 import TodoCard from "~/components/TodoCard";
 import Sidebar from "~/components/Sidebar";
+import {
+  Box,
+  Container,
+  Text,
+  Group,
+  Stack,
+  Paper,
+  Center,
+  Avatar,
+  TextInput
+} from "@mantine/core";
+import { IconClipboard, IconPlus } from "@tabler/icons-react";
 import Button from "~/components/ui/Button";
 import {
   Link,
@@ -29,13 +41,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
     // Use server-side filtering and searching
     if (search && filter !== "all") {
       // Both search and filter
-      todos = await TodosService.searchAndFilterTodos(token, search, filter as "pending" | "completed");
+      todos = await TodosService.searchAndFilterTodos(
+        token,
+        search,
+        filter as "pending" | "completed"
+      );
     } else if (search) {
       // Only search
       todos = await TodosService.searchTodos(token, search);
     } else if (filter !== "all") {
       // Only filter
-      todos = await TodosService.getTodosByStatus(token, filter as "pending" | "completed");
+      todos = await TodosService.getTodosByStatus(
+        token,
+        filter as "pending" | "completed"
+      );
     } else {
       // All todos
       todos = await TodosService.getTodos(token);
@@ -69,11 +88,18 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Home({ loaderData }: any) {
-  const { filter, setFilter, search, setSearch, sortedTodos } =
-    useTodos({ loaderData });
+  const { filter, setFilter, search, setSearch, sortedTodos } = useTodos({
+    loaderData,
+  });
+
+  const filterOptions = [
+    { key: "all", label: "All", icon: "📋" },
+    { key: "pending", label: "Pending", icon: "⏳" },
+    { key: "completed", label: "Done", icon: "✅" },
+  ];
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <Box style={{ display: 'flex', minHeight: '100vh' }} bg="gray.0">
       {/* Desktop Sidebar */}
       <Sidebar
         search={search}
@@ -83,109 +109,124 @@ export default function Home({ loaderData }: any) {
       />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <Box flex={1} style={{ overflow: 'auto' }}>
         {/* Mobile Header with Search and Filters */}
-        <div className="lg:hidden bg-white border-b border-slate-200 p-4 sticky top-0 z-10">
-          <div className="space-y-4">
+        <Box
+          hiddenFrom="lg"
+          bg="white"
+          p="md"
+          pos="sticky"
+          top={0}
+          style={{
+            borderBottom: '1px solid var(--mantine-color-gray-3)',
+            zIndex: 10
+          }}
+        >
+          <Stack gap="md">
             {/* Search */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search tasks..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm text-sm"
-                />
-              </div>
-              <Link to={href("/todos/new")}>
-                <button className="bg-slate-900 text-white px-3 py-3 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 w-12 h-12 inline-flex items-center justify-center font-medium">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
+            <Group gap="sm">
+              <TextInput
+                flex={1}
+                placeholder="Search tasks..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                styles={{
+                  input: {
+                    backgroundColor: 'white',
+                    color: 'black',
+                    border: '1px solid var(--mantine-color-gray-4)',
+                    '&:focus': {
+                      borderColor: 'var(--mantine-color-blue-6)',
+                      backgroundColor: 'white',
+                      color: 'black'
+                    },
+                    '&::placeholder': {
+                      color: 'var(--mantine-color-gray-5)'
+                    }
+                  }
+                }}
+              />
+              <Link to={href("/todos/new")} style={{ textDecoration: 'none' }}>
+                <Button variant="primary" size="sm" style={{ width: '48px', height: '48px', padding: 0 }} radius="xl">
+                  <IconPlus size={16} />
+                </Button>
               </Link>
-            </div>
+            </Group>
 
             {/* Filter Tabs */}
-            <div className="flex gap-2">
-              {[
-                { key: "all", label: "All", icon: "📋" },
-                { key: "pending", label: "Pending", icon: "⏳" },
-                { key: "completed", label: "Done", icon: "✅" },
-              ].map((option) => (
-                <button
+            <Group gap="xs">
+              {filterOptions.map((option) => (
+                <Button
                   key={option.key}
                   onClick={() => setFilter(option.key as any)}
-                  className={`flex-1 px-3 py-2 rounded-full transition-all duration-200 flex items-center justify-center space-x-1 text-xs font-medium ${filter === option.key
-                    ? "bg-slate-900 text-white shadow-md"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200"
-                    }`}
+                  variant={filter === option.key ? "primary" : "secondary"}
+                  size="sm"
+                  radius="xl"
+                  style={{ flex: 1, height: '32px', padding: '0 12px' }}
                 >
-                  <span>{option.icon}</span>
-                  <span>{option.label}</span>
-                </button>
+                  <Group gap="4px" justify="center">
+                    <Text size="xs" c="inherit">{option.icon}</Text>
+                    <Text size="xs" c="inherit" fw={500}>{option.label}</Text>
+                  </Group>
+                </Button>
               ))}
-            </div>
-          </div>
-        </div>
+            </Group>
+          </Stack>
+        </Box>
 
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
+        <Container size="xl" px="md" py="xl">
           {/* Desktop Header */}
-          <div className="hidden lg:block mb-8">
-            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
+          <Box visibleFrom="lg" mb="xl">
+            <Text size="xl" fw={700} mb="xs" c="black">
               Your Tasks
-            </h1>
-            <p className="text-sm lg:text-base text-slate-600">
+            </Text>
+            <Text size="sm" c="gray.7">
               {filter === "all" && "All your tasks"}
               {filter === "pending" && "Tasks waiting to be completed"}
               {filter === "completed" && "Your completed tasks"}
-            </p>
-          </div>
+            </Text>
+          </Box>
 
           {/* Content */}
           {sortedTodos.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="bg-white rounded-md shadow-sm border border-slate-200 p-12 max-w-md mx-auto">
-                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg
-                    className="w-10 h-10 text-slate-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            <Center py="xl">
+              <Paper shadow="sm" radius="md" withBorder bg="white" p="xl" maw={400} w="100%">
+                <Stack align="center" gap="lg">
+                  <Avatar
+                    size="xl"
+                    radius="xl"
+                    color="gray"
+                    variant="light"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">
-                  {search ? "No tasks found" : "No tasks yet"}
-                </h3>
-                <p className="text-sm sm:text-base text-slate-600 mb-6">
-                  {search
-                    ? "Try adjusting your search terms"
-                    : "Create your first task to get started"}
-                </p>
-                <Link to={href("/todos/new")}>
-                  <Button variant="primary" size="md">
-                    <span className="text-xs">Create Your First Task</span>
-                  </Button>
-                </Link>
-              </div>
-            </div>
+                    <IconClipboard size={40} stroke={1.5} />
+                  </Avatar>
+                  <Stack align="center" gap="xs">
+                    <Text size="lg" fw={600} c="black">
+                      {search ? "No tasks found" : "No tasks yet"}
+                    </Text>
+                    <Text size="sm" c="gray.7" ta="center">
+                      {search
+                        ? "Try adjusting your search terms"
+                        : "Create your first task to get started"}
+                    </Text>
+                  </Stack>
+                  <Link to={href("/todos/new")} style={{ textDecoration: 'none' }}>
+                    <Button variant="primary" size="md">
+                      Create Your First Task
+                    </Button>
+                  </Link>
+                </Stack>
+              </Paper>
+            </Center>
           ) : (
-            <div className="space-y-4">
+            <Stack gap="md">
               {sortedTodos.map((todo) => (
                 <TodoCard key={todo.id} todo={todo} />
               ))}
-            </div>
+            </Stack>
           )}
-        </div>
-      </div>
-    </div>
+        </Container>
+      </Box>
+    </Box>
   );
 }

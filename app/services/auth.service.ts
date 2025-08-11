@@ -32,6 +32,9 @@ export class AuthService {
       method: "POST",
       body: JSON.stringify(credentials),
     });
+    if (!response.data) {
+      throw new Error("Login failed - no data received");
+    }
     return response.data;
   }
 

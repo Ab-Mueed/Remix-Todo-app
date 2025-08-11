@@ -2,6 +2,8 @@ import { Form, href, redirect, Link, type ActionFunctionArgs } from "react-route
 import { useAuth } from "~/hooks/useAuth";
 import { getCurrentUser } from "~/utils/auth.server";
 import { AuthService } from "~/services/auth.service";
+import { Box, Container, Stack, Text, Paper, Avatar, Alert, Anchor, Center } from "@mantine/core";
+import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
 import Input from "~/components/ui/Input";
 import Button from "~/components/ui/Button";
 
@@ -61,77 +63,90 @@ export default function LoginPage({ actionData, loaderData }: any) {
   const { justRegistered } = loaderData || {};
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-gradient-to-br from-slate-900 to-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <span className="text-white font-semibold text-lg">T</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Welcome back</h1>
-          <p className="text-sm sm:text-base text-slate-600">Sign in to your account</p>
-        </div>
+    <Box style={{ minHeight: '100vh' }} bg="gray.0">
+      <Center h="100vh">
+        <Container size="xs" w="100%">
+          {/* Header */}
+          <Stack align="center" mb="xl">
+            <Avatar
+              size="lg"
+              radius="xl"
+              color="blue"
+              variant="filled"
+            >
+              T
+            </Avatar>
+            <Stack align="center" gap="xs">
+              <Text size="xl" fw={700} c="black">Welcome back</Text>
+              <Text size="sm" c="gray.7">Sign in to your account</Text>
+            </Stack>
+          </Stack>
 
-        {/* Form */}
-        <div className="bg-white rounded-md shadow-sm border border-slate-200 p-6 sm:p-8">
-          <Form method="POST" className="space-y-6">
-            <Input
-              type="email"
-              id="login-email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              label="Email"
-              placeholder="Enter your email"
-              required
-            />
-            <Input
-              type="password"
-              id="login-password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              label="Password"
-              placeholder="Enter your password"
-              required
-            />
-            <Button type="submit" fullWidth size="lg">
-              Sign In
-            </Button>
-          </Form>
+          {/* Form */}
+          <Paper shadow="md" radius="md" bg="white" p="xl">
+            <Form method="POST">
+              <Stack gap="lg">
+                <Input
+                  type="email"
+                  id="login-email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  label="Email"
+                  placeholder="Enter your email"
+                  required
+                />
+                <Input
+                  type="password"
+                  id="login-password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  label="Password"
+                  placeholder="Enter your password"
+                  required
+                />
+                <Button fullWidth size="lg" type="submit">
+                  Sign In
+                </Button>
+              </Stack>
+            </Form>
 
-          {justRegistered && (
-            <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-md">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-emerald-700 font-medium">Account created successfully! Please sign in.</span>
-              </div>
-            </div>
-          )}
+            {justRegistered && (
+              <Alert
+                icon={<IconCheck size={16} />}
+                title="Success"
+                color="teal"
+                variant="light"
+                radius="md"
+                mt="lg"
+              >
+                Account created successfully! Please sign in.
+              </Alert>
+            )}
 
-          {actionData?.error && (
-            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-red-700 font-medium">{actionData.error}</span>
-              </div>
-            </div>
-          )}
+            {actionData?.error && (
+              <Alert
+                icon={<IconAlertCircle size={16} />}
+                title="Error"
+                color="red"
+                variant="light"
+                radius="md"
+                mt="lg"
+              >
+                {actionData.error}
+              </Alert>
+            )}
 
-          <div className="mt-6 text-center">
-            <p className="text-slate-600 text-sm">
+            <Text ta="center" mt="lg" size="sm" c="gray.7">
               Don't have an account?{" "}
-              <Link to={href("/register")} className="text-slate-900 font-medium hover:underline">
+              <Anchor component={Link} to={href("/register")} fw={500}>
                 Sign up
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+              </Anchor>
+            </Text>
+          </Paper>
+        </Container>
+      </Center>
+    </Box>
   );
 }

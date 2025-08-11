@@ -1,4 +1,6 @@
 import { Link, href } from "react-router";
+import { Box, Stack, Text, Group } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
 import type { Filter } from "~/hooks/useTodos";
@@ -18,13 +20,26 @@ export default function Sidebar({ search, setSearch, filter, setFilter }: Sideba
   ] as const;
 
   return (
-    <div className="hidden lg:flex w-64 bg-white border-r border-slate-200 h-screen sticky top-0 flex-col">
+    <Box
+      w={256}
+      bg="white"
+      h="100vh"
+      pos="sticky"
+      top={0}
+      style={{
+        borderRight: '1px solid var(--mantine-color-gray-3)',
+        flexDirection: 'column'
+      }}
+      className="hidden lg:flex"
+    >
       {/* Header */}
-      <div className="p-4 border-b border-slate-200">
-        <h2 className="text-sm font-semibold text-slate-900 mb-3">Search & Filter</h2>
-        
+      <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+        <Text size="sm" fw={600} mb="sm" c="black">
+          Search & Filter
+        </Text>
+
         {/* Search Bar */}
-        <div className="mb-4">
+        <Box mb="md">
           <Input
             type="text"
             id="search-todos"
@@ -32,48 +47,48 @@ export default function Sidebar({ search, setSearch, filter, setFilter }: Sideba
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             fullWidth
-            className="text-sm"
           />
-        </div>
+        </Box>
 
         {/* New Task Button */}
-        <Link to={href("/todos/new")}>
+        <Link to={href("/todos/new")} style={{ textDecoration: 'none' }}>
           <Button variant="primary" fullWidth size="sm">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <IconPlus size={16} style={{ marginRight: '8px' }} />
             New Task
           </Button>
         </Link>
-      </div>
+      </Box>
 
       {/* Filter Options */}
-      <div className="flex-1 p-4">
-        <h3 className="text-xs font-medium text-slate-700 mb-3 uppercase tracking-wide">Filter by Status</h3>
-        <div className="space-y-1">
+      <Box flex={1} p="md">
+        <Text size="xs" fw={500} c="gray.7" mb="sm" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+          Filter by Status
+        </Text>
+        <Stack gap="xs">
           {filterOptions.map((option) => (
-            <button
+            <Button
               key={option.key}
               onClick={() => setFilter(option.key as Filter)}
-              className={`w-full text-left px-3 py-2 rounded-md transition-all duration-200 flex items-center space-x-2 text-sm ${
-                filter === option.key
-                  ? "bg-slate-900 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              }`}
+              variant={filter === option.key ? "primary" : "secondary"}
+              size="sm"
+              fullWidth
+              style={{ justifyContent: 'flex-start', height: '36px' }}
             >
-              <span className="text-sm">{option.icon}</span>
-              <span className="font-medium">{option.label}</span>
-            </button>
+              <Group gap="xs">
+                <Text size="sm" c="inherit">{option.icon}</Text>
+                <Text size="sm" c="inherit" fw={500}>{option.label}</Text>
+              </Group>
+            </Button>
           ))}
-        </div>
-      </div>
+        </Stack>
+      </Box>
 
       {/* Footer */}
-      <div className="p-4 border-t border-slate-200">
-        <div className="text-xs text-slate-500 text-center">
+      <Box p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
+        <Text size="xs" c="gray.6" ta="center">
           Stay organized and productive
-        </div>
-      </div>
-    </div>
+        </Text>
+      </Box>
+    </Box>
   );
 }

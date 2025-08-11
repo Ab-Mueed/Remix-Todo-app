@@ -2,7 +2,7 @@
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8055";
 
 export interface ApiResponse<T = any> {
-  data: T;
+  data: T | null;
   meta?: any;
 }
 
