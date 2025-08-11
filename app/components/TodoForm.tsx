@@ -1,7 +1,8 @@
 import { Form } from "react-router";
 import { Link, href } from "react-router";
-import { Container, Box, Text, Paper, Stack, Group, Alert } from "@mantine/core";
+import { Container, Box, Text, Paper, Stack, Alert } from "@mantine/core";
 import { IconArrowLeft, IconAlertCircle, IconCheck } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
 import Textarea from "./ui/Textarea";
@@ -20,6 +21,13 @@ export default function TodoForm({ mode, initialData, error, message }: TodoForm
   const description = isEdit ? "Update your task details" : "Add a new task to stay organized";
   const submitText = isEdit ? "Save Changes" : "Create Task";
 
+  const [minDate, setMinDate] = useState<string>("");
+
+  useEffect(() => {
+    // Set minimum date on client side to avoid hydration mismatch
+    setMinDate(new Date().toISOString().split("T")[0]);
+  }, []);
+
   return (
     <Box style={{ minHeight: '100vh' }} bg="gray.0">
       <Container size="md" py="xl">
@@ -34,10 +42,7 @@ export default function TodoForm({ mode, initialData, error, message }: TodoForm
               color: 'var(--mantine-color-gray-6)',
               textDecoration: 'none',
               marginBottom: '24px',
-              transition: 'color 200ms ease',
-              '&:hover': {
-                color: 'var(--mantine-color-gray-8)'
-              }
+              transition: 'color 200ms ease'
             }}
           >
             <IconArrowLeft size={16} />
@@ -76,7 +81,7 @@ export default function TodoForm({ mode, initialData, error, message }: TodoForm
                 type="date"
                 name="dueDate"
                 label="Due Date"
-                min={new Date().toISOString().split("T")[0]}
+                min={minDate}
                 defaultValue={initialData?.dueDate ? new Date(initialData.dueDate).toISOString().split("T")[0] : ""}
                 required={!isEdit}
               />

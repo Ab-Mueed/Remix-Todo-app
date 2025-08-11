@@ -80,7 +80,11 @@ export default function TodoCard({ todo }: TodoCardProps) {
                 <Group gap="xs">
                   <IconClock size={12} color="var(--mantine-color-gray-6)" />
                   <Text size="xs" c="gray.6">
-                    Created {new Date(todo.date_created).toLocaleDateString()}
+                    Created {new Date(todo.date_created).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
                   </Text>
                 </Group>
                 {todo.dueDate && (
@@ -91,7 +95,11 @@ export default function TodoCard({ todo }: TodoCardProps) {
                       c={overdue ? "red.7" : "gray.6"}
                       fw={overdue ? 600 : 400}
                     >
-                      Due {new Date(todo.dueDate).toLocaleDateString()}
+                      Due {new Date(todo.dueDate).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
                       {overdue && " (Overdue)"}
                     </Text>
                   </Group>
