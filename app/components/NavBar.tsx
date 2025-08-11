@@ -7,103 +7,112 @@ export default function NavBar() {
 
   if (!loaderData?.user) {
     return (
-      <Box
-        component="nav"
-        bg="white"
+      <div
         style={{
+          backgroundColor: 'white',
           borderBottom: '1px solid var(--mantine-color-gray-3)',
           position: 'relative',
           zIndex: 50,
-          flexShrink: 0
+          flexShrink: 0,
+          padding: '12px 16px'
         }}
-        px="xl"
-        py="md"
       >
-        <Group justify="space-between" w="100%">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <Text c="gray.7">Loading...</Text>
-        </Group>
-      </Box>
+        </div>
+      </div>
     );
   }
 
   const { user } = loaderData;
 
   return (
-    <Box
-      component="nav"
-      bg="white"
+    <div
       style={{
+        backgroundColor: 'white',
         borderBottom: '1px solid var(--mantine-color-gray-3)',
         position: 'relative',
         zIndex: 50,
-        flexShrink: 0
+        flexShrink: 0,
+        padding: '12px 16px'
       }}
-      px="xl"
-      py="md"
     >
-      <Group justify="space-between" w="100%">
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        width: '100%',
+        minHeight: '40px'
+      }}>
         {/* Left side - Logo */}
-        <Group gap="sm">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <Avatar
-            size="md"
+            size="sm"
             radius="xl"
             color="blue"
             variant="filled"
           >
             T
           </Avatar>
-          <Text size="lg" fw={600} c="black">TodoApp</Text>
-        </Group>
+          <Text size="md" fw={600} c="black" style={{ whiteSpace: 'nowrap' }}>
+            TodoApp
+          </Text>
+        </div>
 
         {/* Right side - User info and logout */}
-        <Group gap="md">
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px',
+          flexShrink: 0,
+          minWidth: 0
+        }}>
           {/* User Info */}
-          <Group
-            gap="sm"
-            bg="gray.0"
+          <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: 'var(--mantine-color-gray-0)',
               borderRadius: '9999px',
-              padding: '8px 16px'
+              padding: '6px 10px',
+              minWidth: 0,
+              maxWidth: '150px'
             }}
           >
             <Avatar
-              size="sm"
+              size="xs"
               radius="xl"
               color="gray"
               variant="light"
             >
               {user.first_name.charAt(0)}{user.last_name.charAt(0)}
             </Avatar>
-            <Box visibleFrom="sm">
-              <Stack gap={0}>
-                <Text size="xs" fw={500} c="black">
-                  {user.first_name} {user.last_name}
-                </Text>
-                <Text size="xs" c="gray.6">
-                  {user.email}
-                </Text>
-              </Stack>
-            </Box>
-            <Box hiddenFrom="sm">
-              <Text size="xs" fw={500} c="black">
-                {user.first_name}
-              </Text>
-            </Box>
-          </Group>
+            <Text 
+              size="xs" 
+              fw={500} 
+              c="black" 
+              truncate
+              style={{ minWidth: 0 }}
+            >
+              {user.first_name}
+            </Text>
+          </div>
 
           {/* Logout Button */}
-          <Form action="/logout" method="POST" style={{ display: 'inline' }}>
+          <Form action="/logout" method="POST" style={{ display: 'inline', flexShrink: 0 }}>
             <Button
               variant="danger"
               size="sm"
               type="submit"
               radius="xl"
+              style={{ fontSize: '12px', padding: '6px 12px', height: '32px' }}
             >
               Logout
             </Button>
           </Form>
-        </Group>
-      </Group>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
